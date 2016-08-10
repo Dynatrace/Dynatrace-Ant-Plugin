@@ -1,5 +1,10 @@
 package com.dynatrace.diagnostics.automation.ant;
 
+import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
+import com.dynatrace.sdk.server.exceptions.ServerResponseException;
+import com.dynatrace.sdk.server.sessions.Sessions;
+import com.dynatrace.sdk.server.sessions.models.RecordingOption;
+import com.dynatrace.sdk.server.sessions.models.StartRecordingRequest;
 import org.apache.tools.ant.BuildException;
 
 /**
@@ -10,77 +15,93 @@ import org.apache.tools.ant.BuildException;
  */
 public class DtStartRecording extends DtServerProfileBase {
 
-	private String sessionName;
-	private String sessionDescription;
-	private String recordingOption;
-	private String sessionNameProperty;
-	private boolean sessionLocked;
-	private boolean appendTimestamp;
+    private String sessionName;
+    private String sessionDescription;
+    private String recordingOption;
+    private String sessionNameProperty;
+    private boolean sessionLocked;
+    private boolean appendTimestamp;
 
-	@Override
-	public void execute() throws BuildException {
-		String sessionName = getEndpoint().startRecording(getProfileName(), getSessionName(), getSessionDescription(), getRecordingOption(), isSessionLocked(), !isAppendTimestamp());
+    @Override
+    public void execute() throws BuildException {
+        Sessions sessions = new Sessions(this.getDynatraceClient());
 
-		log("Started recording on " + getProfileName() + " with SessionName " + sessionName); //$NON-NLS-1$ //$NON-NLS-2$
+        StartRecordingRequest startRecordingRequest = new StartRecordingRequest(this.getProfileName());
+        startRecordingRequest.setPresentableName(this.getSessionName());
+        startRecordingRequest.setDescription(this.getSessionDescription());
+        startRecordingRequest.setSessionLocked(this.isSessionLocked());
+        startRecordingRequest.setTimestampAllowed(this.isAppendTimestamp());
 
-		if(sessionNameProperty != null && sessionNameProperty.length() > 0)
-			this.getProject().setProperty(sessionNameProperty, sessionName);
-	}
+        if (this.getRecordingOption() != null) {
+            startRecordingRequest.setRecordingOption(RecordingOption.fromInternal(this.getRecordingOption()));
+        }
 
-	public void setSessionName(String sessionName) {
-		this.sessionName = sessionName;
-	}
+        try {
+            String sessionName = sessions.startRecording(startRecordingRequest);
 
-	public String getSessionName() {
-		return sessionName;
-	}
+            log("Started recording on " + getProfileName() + " with SessionName " + sessionName); //$NON-NLS-1$ //$NON-NLS-2$
 
-	public void setSessionDescription(String sessionDescription) {
-		this.sessionDescription = sessionDescription;
-	}
+            if (sessionNameProperty != null && sessionNameProperty.length() > 0) {
+                this.getProject().setProperty(sessionNameProperty, sessionName);
+            }
+        } catch (ServerConnectionException | ServerResponseException e) {
+            throw new BuildException(e.getMessage(), e);
+        }
+    }
 
-	public String getSessionDescription() {
-		return sessionDescription;
-	}
+    public String getSessionName() {
+        return sessionName;
+    }
 
-	public void setRecordingOption(String recordingOption) {
-		this.recordingOption = recordingOption;
-	}
+    public void setSessionName(String sessionName) {
+        this.sessionName = sessionName;
+    }
 
-	public String getRecordingOption() {
-		return recordingOption;
-	}
+    public String getSessionDescription() {
+        return sessionDescription;
+    }
 
-	public void setSessionLocked(boolean sessionLocked) {
-		this.sessionLocked = sessionLocked;
-	}
+    public void setSessionDescription(String sessionDescription) {
+        this.sessionDescription = sessionDescription;
+    }
 
-	public boolean isSessionLocked() {
-		return sessionLocked;
-	}
+    public String getRecordingOption() {
+        return recordingOption;
+    }
 
-	public void setAppendTimestamp(boolean appendTimestamp) {
-		this.appendTimestamp = appendTimestamp;
-	}
+    public void setRecordingOption(String recordingOption) {
+        this.recordingOption = recordingOption;
+    }
 
-	public boolean isAppendTimestamp() {
-		return appendTimestamp;
-	}
+    public boolean isSessionLocked() {
+        return sessionLocked;
+    }
 
-	public void setSessionNameProperty(String sessionNameProperty) {
-		this.sessionNameProperty = sessionNameProperty;
-	}
+    public void setSessionLocked(boolean sessionLocked) {
+        this.sessionLocked = sessionLocked;
+    }
 
-	/**
-	 *
-	 * @return the name of the session the recording is started
-	 */
-	public String getSessionNameProperty() {
-		if(sessionNameProperty == null) {
-				String dtSessionNameProperty = this.getProject().getProperty("dtSessionNameProperty"); //$NON-NLS-1$
-				if(dtSessionNameProperty != null && dtSessionNameProperty.length() > 0)
-					sessionNameProperty = dtSessionNameProperty;
-		}
-		return sessionNameProperty;
-	}
+    public boolean isAppendTimestamp() {
+        return appendTimestamp;
+    }
+
+    public void setAppendTimestamp(boolean appendTimestamp) {
+        this.appendTimestamp = appendTimestamp;
+    }
+
+    /**
+     * @return the name of the session the recording is started
+     */
+    public String getSessionNameProperty() {
+        if (sessionNameProperty == null) {
+            String dtSessionNameProperty = this.getProject().getProperty("dtSessionNameProperty"); //$NON-NLS-1$
+            if (dtSessionNameProperty != null && dtSessionNameProperty.length() > 0)
+                sessionNameProperty = dtSessionNameProperty;
+        }
+        return sessionNameProperty;
+    }
+
+    public void setSessionNameProperty(String sessionNameProperty) {
+        this.sessionNameProperty = sessionNameProperty;
+    }
 }

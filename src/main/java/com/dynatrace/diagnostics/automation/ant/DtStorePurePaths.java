@@ -1,39 +1,58 @@
 package com.dynatrace.diagnostics.automation.ant;
 
+import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
+import com.dynatrace.sdk.server.exceptions.ServerResponseException;
+import com.dynatrace.sdk.server.sessions.Sessions;
+import com.dynatrace.sdk.server.sessions.models.RecordingOption;
+import com.dynatrace.sdk.server.sessions.models.StoreSessionRequest;
 import org.apache.tools.ant.BuildException;
 
 
-public class DtStorePurePaths extends DtServerProfileBase{
-	private String recordingOption;
-	private boolean sessionLocked;
-	private boolean appendTimestamp;
+public class DtStorePurePaths extends DtServerProfileBase {
+    private String recordingOption;
+    private boolean sessionLocked;
+    private boolean appendTimestamp;
 
-	@Override
-	public void execute() throws BuildException {
-		getEndpoint().storePurePaths(getProfileName(), getRecordingOption(), isSessionLocked(), isAppendTimestamp());
-	}
+    @Override
+    public void execute() throws BuildException {
+        Sessions sessions = new Sessions(this.getDynatraceClient());
 
-	public String getRecordingOption() {
-		return recordingOption;
-	}
+        StoreSessionRequest storeSessionRequest = new StoreSessionRequest(this.getProfileName());
+        storeSessionRequest.setSessionLocked(this.isSessionLocked());
+        storeSessionRequest.setAppendTimestamp(this.isAppendTimestamp());
 
-	public void setRecordingOption(String recordingOption) {
-		this.recordingOption = recordingOption;
-	}
+        if (this.getRecordingOption() != null) {
+            storeSessionRequest.setRecordingOption(RecordingOption.fromInternal(this.getRecordingOption()));
+        }
 
-	public boolean isSessionLocked() {
-		return sessionLocked;
-	}
+        try {
+            sessions.store(storeSessionRequest);
+        } catch (ServerConnectionException | ServerResponseException e) {
+            throw new BuildException(e.getMessage(), e);
+        }
+    }
 
-	public void setSessionLocked(boolean sessionLocked) {
-		this.sessionLocked = sessionLocked;
-	}
+    public String getRecordingOption() {
+        return recordingOption;
+    }
 
-	public boolean isAppendTimestamp() {
-		return appendTimestamp;
-	}
+    public void setRecordingOption(String recordingOption) {
+        this.recordingOption = recordingOption;
+    }
 
-	public void setAppendTimestamp(boolean appendTimestamp) {
-		this.appendTimestamp = appendTimestamp;
-	}
+    public boolean isSessionLocked() {
+        return sessionLocked;
+    }
+
+    public void setSessionLocked(boolean sessionLocked) {
+        this.sessionLocked = sessionLocked;
+    }
+
+    public boolean isAppendTimestamp() {
+        return appendTimestamp;
+    }
+
+    public void setAppendTimestamp(boolean appendTimestamp) {
+        this.appendTimestamp = appendTimestamp;
+    }
 }

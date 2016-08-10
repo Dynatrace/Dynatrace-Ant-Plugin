@@ -9,15 +9,19 @@
  */
 package com.dynatrace.diagnostics.automation.ant;
 
+import com.dynatrace.diagnostics.automation.common.DtStartTestCommon;
+import com.dynatrace.sdk.server.testautomation.TestAutomation;
+import com.dynatrace.sdk.server.testautomation.models.CreateTestRunRequest;
+import com.dynatrace.sdk.server.testautomation.models.TestCategory;
+import com.dynatrace.sdk.server.testautomation.models.TestMetaData;
+import com.dynatrace.sdk.server.testautomation.models.TestRun;
+import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
+
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import org.apache.tools.ant.BuildException;
-import org.apache.tools.ant.Project;
-
-import com.dynatrace.diagnostics.automation.common.DtStartTestCommon;
 
 /**
  * Ant task to start a testrun.
@@ -27,189 +31,209 @@ import com.dynatrace.diagnostics.automation.common.DtStartTestCommon;
  */
 public class DtStartTest extends DtServerProfileBase {
 
-	private String versionMajor;
-	private String versionMinor;
-	private String versionRevision;
-	private String versionMilestone;
-	private String versionBuild;
-	private String marker;
-	private String category;
-	private String platform;
-	private String loadTestName;
-	private final List<CustomProperty> properties = new ArrayList<CustomProperty>();
+    private final List<CustomProperty> properties = new ArrayList<CustomProperty>();
+    private String versionMajor;
+    private String versionMinor;
+    private String versionRevision;
+    private String versionMilestone;
+    private String versionBuild;
+    private String marker;
+    private String category;
+    private String platform;
+    private String loadTestName;
+    /**
+     * Flag to print debug information. Default: false
+     */
+    // DO NOT REMOVE for backward compatibility!
+    private boolean debug = false;
 
+    /**
+     * Flag to make this task fail on error. Default: true
+     */
+    private boolean failOnError = true;
 
-	/** Flag to print debug information. Default: false */
-	// DO NOT REMOVE for backward compatibility!
-	private boolean debug = false;
+    /**
+     * Used to add a custom property to the test meta data
+     *
+     * @param property
+     */
+    public void addCustomProperty(final CustomProperty property) {
+        properties.add(property);
+    }
 
-	/** Flag to make this task fail on error. Default: true */
-	private boolean failOnError = true;
+    @Override
+    public void execute() throws BuildException {
+        try {
+            checkParameters();
+            checkVersionInformation();
+            final HashMap<String, String> additionalInformation = new HashMap<String, String>();
+            for (CustomProperty property : properties) {
+                additionalInformation.put(property.getKey(), property.getValue());
+            }
+            log(DtStartTestCommon.generateInfoMessage(getProfileName(), versionMajor, versionMinor, versionRevision,
+                    versionBuild, versionMilestone, marker, category, loadTestName, platform, additionalInformation),
+                    Project.MSG_INFO);
 
-	/**
-	 * Used to add a custom property to the test meta data
-	 *
-	 * @param property
-	 */
-	public void addCustomProperty(final CustomProperty property) {
-		properties.add(property);
-	}
+            TestAutomation testAutomation = new TestAutomation(this.getDynatraceClient());
 
-	@Override
-	public void execute() throws BuildException {
-		try {
-			checkParameters();
-			checkVersionInformation();
-			final HashMap<String, String> additionalInformation = new HashMap<String, String>();
-			for (CustomProperty property : properties) {
-				additionalInformation.put(property.getKey(), property.getValue());
-			}
-			log(DtStartTestCommon.generateInfoMessage(getProfileName(), versionMajor, versionMinor, versionRevision,
-					versionBuild, versionMilestone, marker, category, loadTestName, platform, additionalInformation),
-					Project.MSG_INFO);
-			String testrunUUID = getEndpoint().startTest(getProfileName(), versionMajor,
-					versionMinor, versionRevision, versionBuild, versionMilestone,
-					marker, category, platform, loadTestName, additionalInformation);
-			log(MessageFormat.format(DtStartTestCommon.TESTRUN_ID_PROPERTY_MESSAGE, testrunUUID));
-			getProject().setProperty(DtStartTestCommon.TESTRUN_ID_PROPERTY_NAME, testrunUUID);
-		} catch (Exception e) {
-			if (failOnError) {
-				if (e instanceof BuildException) {
-					throw (BuildException) e;
-				}
-				throw new BuildException(e);
-			}
-			log("Exception when executing task: " + e.getMessage(), e, Project.MSG_ERR); //$NON-NLS-1$
-		}
-	}
+            CreateTestRunRequest request = new CreateTestRunRequest();
+            request.setSystemProfile(this.getProfileName());
+            request.setVersionMajor(this.versionMajor);
+            request.setVersionMinor(this.versionMinor);
+            request.setVersionRevision(this.versionRevision);
+            request.setVersionBuild(this.versionBuild);
+            request.setVersionMilestone(this.versionMilestone);
+            request.setMarker(this.marker);
+            request.setCategory(TestCategory.fromInternal(this.category));
+            request.setPlatform(this.platform);
+            request.setAdditionalMetaData(new TestMetaData(additionalInformation));
 
+			/* FIXME? TODO? loadTestName is not used anymore! */
+            TestRun testRun = testAutomation.createTestRun(request);
 
-	private void checkParameters() {
-		if (versionBuild == null) {
-			throw new BuildException(DtStartTestCommon.MISSING_BUILD_MESSAGE);
-		}
-		if (category == null) {
-			throw new BuildException(DtStartTestCommon.MISSING_CATEGORY_MESSAGE);
-		}
-		if (!DtStartTestCommon.TEST_CATEGORIES.contains(category)) {
-			throw new BuildException(MessageFormat.format(DtStartTestCommon.INVALID_CATEGORY_MESSAGE, category));
-		}
-		if (category != null && DtStartTestCommon.TEST_CATEGORY_LOAD.equalsIgnoreCase(category) && loadTestName == null) {
-			throw new BuildException(DtStartTestCommon.MISSING_LOAD_TEST_NAME_MESSAGE);
-		}
-	}
+            String testrunUUID = testRun.getId();
 
-	private void checkVersionInformation() {
-		if (versionBuild != null && !DtStartTestCommon.isBuildNumberValid(versionBuild)) {
-			throw new BuildException(DtStartTestCommon.INVALID_BUILD_NUMBER_MESSAGE);
-		}
-	}
+            log(MessageFormat.format(DtStartTestCommon.TESTRUN_ID_PROPERTY_MESSAGE, testrunUUID));
+            getProject().setProperty(DtStartTestCommon.TESTRUN_ID_PROPERTY_NAME, testrunUUID);
+        } catch (Exception e) {
+            if (failOnError) {
+                if (e instanceof BuildException) {
+                    throw (BuildException) e;
+                }
+                throw new BuildException(e.getMessage(), e);
+            }
+            log("Exception when executing task: " + e.getMessage(), e, Project.MSG_ERR); //$NON-NLS-1$
+        }
+    }
 
-	public final String getVersionMajor() {
-		return versionMajor;
-	}
+    private void checkParameters() {
+        if (versionBuild == null) {
+            throw new BuildException(DtStartTestCommon.MISSING_BUILD_MESSAGE);
+        }
+        if (category == null) {
+            throw new BuildException(DtStartTestCommon.MISSING_CATEGORY_MESSAGE);
+        }
+        if (!DtStartTestCommon.TEST_CATEGORIES.contains(category)) {
+            throw new BuildException(MessageFormat.format(DtStartTestCommon.INVALID_CATEGORY_MESSAGE, category));
+        }
+        if (category != null && DtStartTestCommon.TEST_CATEGORY_LOAD.equalsIgnoreCase(category) && loadTestName == null) {
+            throw new BuildException(DtStartTestCommon.MISSING_LOAD_TEST_NAME_MESSAGE);
+        }
+    }
 
-	public final void setVersionMajor(String versionMajor) {
-		this.versionMajor = versionMajor;
-	}
+    private void checkVersionInformation() {
+        if (versionBuild != null && !DtStartTestCommon.isBuildNumberValid(versionBuild)) {
+            throw new BuildException(DtStartTestCommon.INVALID_BUILD_NUMBER_MESSAGE);
+        }
+    }
 
-	public final String getVersionMinor() {
-		return versionMinor;
-	}
+    public final String getVersionMajor() {
+        return versionMajor;
+    }
 
-	public final void setVersionMinor(String versionMinor) {
-		this.versionMinor = versionMinor;
-	}
+    public final void setVersionMajor(String versionMajor) {
+        this.versionMajor = versionMajor;
+    }
 
-	public final String getVersionRevision() {
-		return versionRevision;
-	}
+    public final String getVersionMinor() {
+        return versionMinor;
+    }
 
-	public final void setVersionRevision(String versionRevision) {
-		this.versionRevision = versionRevision;
-	}
+    public final void setVersionMinor(String versionMinor) {
+        this.versionMinor = versionMinor;
+    }
 
-	/**
-	 * Not supported since dT 6.2
-	 *
-	 * @return {@code null}
-	 */
-	@Deprecated
-	public final String getAgentGroup() {
-		return null;
-	}
+    public final String getVersionRevision() {
+        return versionRevision;
+    }
 
-	/** Not supported since dT 6.2 */
-	@Deprecated
-	public final void setAgentGroup(String agentGroup) {
-	}
+    public final void setVersionRevision(String versionRevision) {
+        this.versionRevision = versionRevision;
+    }
 
-	public final String getVersionMilestone() {
-		return versionMilestone;
-	}
+    /**
+     * Not supported since dT 6.2
+     *
+     * @return {@code null}
+     */
+    @Deprecated
+    public final String getAgentGroup() {
+        return null;
+    }
 
-	public final void setVersionMilestone(String versionMilestone) {
-		this.versionMilestone = versionMilestone;
-	}
+    /**
+     * Not supported since dT 6.2
+     */
+    @Deprecated
+    public final void setAgentGroup(String agentGroup) {
+    }
 
-	public final String getVersionBuild() {
-		return versionBuild;
-	}
+    public final String getVersionMilestone() {
+        return versionMilestone;
+    }
 
-	public final void setVersionBuild(String versionBuild) {
-		this.versionBuild = versionBuild;
-	}
+    public final void setVersionMilestone(String versionMilestone) {
+        this.versionMilestone = versionMilestone;
+    }
 
-	public final String getMarker() {
-		return marker;
-	}
+    public final String getVersionBuild() {
+        return versionBuild;
+    }
 
-	public final void setMarker(String marker) {
-		this.marker = marker;
-	}
+    public final void setVersionBuild(String versionBuild) {
+        this.versionBuild = versionBuild;
+    }
 
-	public final String getCategory() {
-		return category;
-	}
+    public final String getMarker() {
+        return marker;
+    }
 
-	public final void setCategory(String category) {
-		this.category = category;
-	}
+    public final void setMarker(String marker) {
+        this.marker = marker;
+    }
 
-	public final String getPlatform() {
-		return platform;
-	}
+    public final String getCategory() {
+        return category;
+    }
 
-	public final void setPlatform(String platform) {
-		this.platform = platform;
-	}
+    public final void setCategory(String category) {
+        this.category = category;
+    }
 
-	public final String getLoadTestName() {
-		return loadTestName;
-	}
+    public final String getPlatform() {
+        return platform;
+    }
 
-	/**
-	 * Method supporting setting load test name with old parameter 'testrunname'
-	 * It's left only for compatibiliy with existing Ant scripts.
-	 * Use {@link #setLoadTestName(String)} instead.
-	 *
-	 * @param testrunname
-	 */
-	@Deprecated
-	public final void setTestrunname(String testrunname) {
-		this.loadTestName = testrunname;
-	}
+    public final void setPlatform(String platform) {
+        this.platform = platform;
+    }
 
-	public final void setLoadTestName(String loadTestName) {
-		this.loadTestName = loadTestName;
-	}
+    public final String getLoadTestName() {
+        return loadTestName;
+    }
 
-	public void setDebug(boolean debug) {
-		this.debug = debug;
-	}
+    public final void setLoadTestName(String loadTestName) {
+        this.loadTestName = loadTestName;
+    }
 
-	public void setFailOnError(boolean failOnError) {
-		this.failOnError = failOnError;
-	}
+    /**
+     * Method supporting setting load test name with old parameter 'testrunname'
+     * It's left only for compatibiliy with existing Ant scripts.
+     * Use {@link #setLoadTestName(String)} instead.
+     *
+     * @param testrunname
+     */
+    @Deprecated
+    public final void setTestrunname(String testrunname) {
+        this.loadTestName = testrunname;
+    }
+
+    public void setDebug(boolean debug) {
+        this.debug = debug;
+    }
+
+    public void setFailOnError(boolean failOnError) {
+        this.failOnError = failOnError;
+    }
 
 }

@@ -1,77 +1,93 @@
 package com.dynatrace.diagnostics.automation.ant;
 
+import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
+import com.dynatrace.sdk.server.exceptions.ServerResponseException;
+import com.dynatrace.sdk.server.resourcedumps.ResourceDumps;
+import com.dynatrace.sdk.server.resourcedumps.models.CreateThreadDumpRequest;
 import org.apache.tools.ant.BuildException;
 
 public class DtThreadDump extends DtAgentBase {
 
-	private boolean sessionLocked;
-	private String threadDumpNameProperty;
-	
-	private int waitForDumpTimeout = 60000;
-	private int waitForDumpPollingInterval = 5000;
-	private String dumpStatusProperty;	
-	
-	@Override
-	public void execute() throws BuildException {
-		System.out.println("Creating Thread Dump for " + getProfileName() + "-" + getAgentName() + "-" + getHostName() + "-" + getProcessId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
-		
-		String threadDump = getEndpoint().threadDump(getProfileName(), getAgentName(), getHostName(), getProcessId(), isSessionLocked());
-		if(threadDumpNameProperty != null && threadDumpNameProperty.length() > 0)
-			this.getProject().setProperty(threadDumpNameProperty, threadDump);
-		
-		int timeout = waitForDumpTimeout;
-		boolean dumpFinished = getEndpoint().threadDumpStatus(getProfileName(), threadDump).isResultValueTrue();
-		while(!dumpFinished && (timeout > 0)) {
-			try {
-				java.lang.Thread.sleep(waitForDumpPollingInterval);
-				timeout -= waitForDumpPollingInterval;
-			} catch (InterruptedException e) {
-			}
-			
-			dumpFinished = getEndpoint().threadDumpStatus(getProfileName(), threadDump).isResultValueTrue();
-		}
-		
-		if(dumpStatusProperty != null && dumpStatusProperty.length() > 0)
-			this.getProject().setProperty(dumpStatusProperty, String.valueOf(dumpFinished));
-	}
+    private boolean sessionLocked;
+    private String threadDumpNameProperty;
 
-	public void setSessionLocked(boolean sessionLocked) {
-		this.sessionLocked = sessionLocked;
-	}
+    private int waitForDumpTimeout = 60000;
+    private int waitForDumpPollingInterval = 5000;
+    private String dumpStatusProperty;
 
-	public boolean isSessionLocked() {
-		return sessionLocked;
-	}
+    @Override
+    public void execute() throws BuildException {
+        System.out.println("Creating Thread Dump for " + getProfileName() + "-" + getAgentName() + "-" + getHostName() + "-" + getProcessId()); //$NON-NLS-1$ //$NON-NLS-2$ //$NON-NLS-3$ //$NON-NLS-4$
 
-	public void setThreadDumpNameProperty(String threadDumpNameProperty) {
-		this.threadDumpNameProperty = threadDumpNameProperty;
-	}
+        ResourceDumps resourceDumps = new ResourceDumps(this.getDynatraceClient());
+        CreateThreadDumpRequest createThreadDumpRequest = new CreateThreadDumpRequest(this.getProfileName(), this.getAgentName(), this.getHostName(), this.getProcessId());
+        createThreadDumpRequest.setSessionLocked(this.isSessionLocked());
 
-	public String getThreadDumpNameProperty() {
-		return threadDumpNameProperty;
-	}
+        try {
+            String threadDump = resourceDumps.createThreadDump(createThreadDumpRequest);
 
-	public void setWaitForDumpTimeout(int waitForDumpTimeout) {
-		this.waitForDumpTimeout = waitForDumpTimeout;
-	}
+            if (threadDumpNameProperty != null && threadDumpNameProperty.length() > 0) {
+                this.getProject().setProperty(threadDumpNameProperty, threadDump);
+            }
 
-	public int getWaitForDumpTimeout() {
-		return waitForDumpTimeout;
-	}
+            int timeout = waitForDumpTimeout;
 
-	public void setWaitForDumpPollingInterval(int waitForDumpPollingInterval) {
-		this.waitForDumpPollingInterval = waitForDumpPollingInterval;
-	}
+            boolean dumpFinished = resourceDumps.getThreadDumpStatus(this.getProfileName(), threadDump).isSuccessful();
+            while (!dumpFinished && (timeout > 0)) {
+                try {
+                    java.lang.Thread.sleep(waitForDumpPollingInterval);
+                    timeout -= waitForDumpPollingInterval;
+                } catch (InterruptedException e) {
+                }
 
-	public int getWaitForDumpPollingInterval() {
-		return waitForDumpPollingInterval;
-	}
+                dumpFinished = resourceDumps.getThreadDumpStatus(this.getProfileName(), threadDump).isSuccessful();
+            }
 
-	public void setDumpStatusProperty(String dumpStatusProperty) {
-		this.dumpStatusProperty = dumpStatusProperty;
-	}
+            if (dumpStatusProperty != null && dumpStatusProperty.length() > 0) {
+                this.getProject().setProperty(dumpStatusProperty, String.valueOf(dumpFinished));
+            }
+        } catch (ServerConnectionException | ServerResponseException e) {
+            throw new BuildException(e.getMessage(), e);
+        }
+    }
 
-	public String getDumpStatusProperty() {
-		return dumpStatusProperty;
-	}
+    public boolean isSessionLocked() {
+        return sessionLocked;
+    }
+
+    public void setSessionLocked(boolean sessionLocked) {
+        this.sessionLocked = sessionLocked;
+    }
+
+    public String getThreadDumpNameProperty() {
+        return threadDumpNameProperty;
+    }
+
+    public void setThreadDumpNameProperty(String threadDumpNameProperty) {
+        this.threadDumpNameProperty = threadDumpNameProperty;
+    }
+
+    public int getWaitForDumpTimeout() {
+        return waitForDumpTimeout;
+    }
+
+    public void setWaitForDumpTimeout(int waitForDumpTimeout) {
+        this.waitForDumpTimeout = waitForDumpTimeout;
+    }
+
+    public int getWaitForDumpPollingInterval() {
+        return waitForDumpPollingInterval;
+    }
+
+    public void setWaitForDumpPollingInterval(int waitForDumpPollingInterval) {
+        this.waitForDumpPollingInterval = waitForDumpPollingInterval;
+    }
+
+    public String getDumpStatusProperty() {
+        return dumpStatusProperty;
+    }
+
+    public void setDumpStatusProperty(String dumpStatusProperty) {
+        this.dumpStatusProperty = dumpStatusProperty;
+    }
 }
