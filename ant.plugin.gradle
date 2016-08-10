@@ -1,6 +1,6 @@
 dependencies{
 	compileAndIncludeInJar project(":automation.common")
-	compileAndIncludeInJar project(":automation.rest.api")
+	compileAndIncludeInJar fileTree(dir: '../lib', include: '*.jar')
 	
 	compile "org.apache.ant:ant:1.7.1"
 }
