@@ -1,0 +1,6 @@
+dependencies{
+	compileAndIncludeInJar project(":automation.common")
+	compileAndIncludeInJar project(":automation.rest.api")
+	
+	compile "org.apache.ant:ant:1.7.1"
+}
