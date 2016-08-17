@@ -8,6 +8,7 @@ import com.dynatrace.sdk.server.memorydumps.models.JobState;
 import com.dynatrace.sdk.server.memorydumps.models.MemoryDumpJob;
 import com.dynatrace.sdk.server.memorydumps.models.StoredSessionType;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -41,7 +42,7 @@ public class DtMemoryDump extends DtAgentBase {
         memoryDumpJob.setDogc(this.getDoGc());
 
         if (this.getDumpType() != null) {
-            memoryDumpJob.setStoredSessionType(StoredSessionType.fromInternal(this.getDumpType())); /* TODO FIXME - dump type is wrong? use new values with prefixes! */
+            memoryDumpJob.setStoredSessionType(StoredSessionType.fromInternal(this.getDumpType()));
         }
 
         try {
@@ -84,7 +85,9 @@ public class DtMemoryDump extends DtAgentBase {
 
             if (dumpStatusProperty != null && dumpStatusProperty.length() > 0)
                 this.getProject().setProperty(dumpStatusProperty, String.valueOf(dumpFinished));
-        } catch (ServerConnectionException | ServerResponseException e) {
+        } catch (ServerResponseException e) {
+            this.log(String.format("Cannot take memory dump: %s", e.getMessage()), Project.MSG_ERR);
+        } catch (ServerConnectionException e) {
             throw new BuildException(e.getMessage(), e);
         } catch (URISyntaxException e) {
             throw new BuildException(e.getMessage(), e);

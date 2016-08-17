@@ -10,15 +10,15 @@ import java.net.URI;
 import java.net.URISyntaxException;
 
 public abstract class DtServerBase extends Task {
-
     private static final String PROTOCOL_WITHOUT_SSL = "http";
     private static final String PROTOCOL_WITH_SSL = "https";
+
+    private DynatraceClient dynatraceClient;
     private String username = null;
     private String password = null;
     private String serverUrl = null;
-    private DynatraceClient dynatraceClient;
+    private Boolean ignoreSSLErrors = null;
 
-    /* TODO: default values for BasicServerConfiguration should be better-looking */
     private BasicServerConfiguration buildServerConfiguration() {
         try {
             URIBuilder uriBuilder = new URIBuilder(this.getServerUrl());
@@ -32,10 +32,10 @@ public abstract class DtServerBase extends Task {
             if (protocol != null && (protocol.equals(PROTOCOL_WITH_SSL) || protocol.equals(PROTOCOL_WITHOUT_SSL))) {
                 ssl = protocol.equals(PROTOCOL_WITH_SSL);
             } else {
-                throw new URISyntaxException(protocol, "Invalid protocol name in serverUrl"); //maybe something better?
+                throw new URISyntaxException(protocol, "Invalid protocol name in serverUrl");
             }
 
-            return new BasicServerConfiguration(this.getUsername(), this.getPassword(), ssl, host, port, false, BasicServerConfiguration.DEFAULT_CONNECTION_TIMEOUT);
+            return new BasicServerConfiguration(this.getUsername(), this.getPassword(), ssl, host, port, !this.getIgnoreSSLErrors(), BasicServerConfiguration.DEFAULT_CONNECTION_TIMEOUT);
         } catch (URISyntaxException e) {
             throw new BuildException(e.getMessage(), e); //? proper way?
         }
@@ -86,5 +86,30 @@ public abstract class DtServerBase extends Task {
 
     public void setServerUrl(String serverUrl) {
         this.serverUrl = serverUrl;
+    }
+
+    /**
+     * Returns {@code ignoreSSLErrors} flag value. Should never return {@code null}.
+     * In case {@code ignoreSSLErrors} flag is not set, also assigns value given
+     * in {@code dtIgnoreSSLErrors} Ant property or the default value {@code TRUE}.
+     */
+    public Boolean getIgnoreSSLErrors() {
+        if (ignoreSSLErrors == null) {
+            String dtIgnoreSSLErrorsProperty = this.getProject().getProperty("dtIgnoreSSLErrors"); //$NON-NLS-1$
+            // only override default value if property is a valid boolean string representation
+            // without that malformed property value would cause returning false
+            if (Boolean.FALSE.toString().equalsIgnoreCase(dtIgnoreSSLErrorsProperty) ||
+                    Boolean.TRUE.toString().equalsIgnoreCase(dtIgnoreSSLErrorsProperty)) {
+                ignoreSSLErrors = Boolean.valueOf(dtIgnoreSSLErrorsProperty);
+            } else {
+                // malformed property value, assign default value
+                ignoreSSLErrors = Boolean.TRUE;
+            }
+        }
+        return ignoreSSLErrors;
+    }
+
+    public void setIgnoreSSLErrors(Boolean ignoreSSLErrors) {
+        this.ignoreSSLErrors = ignoreSSLErrors;
     }
 }

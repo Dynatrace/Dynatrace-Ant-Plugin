@@ -40,7 +40,6 @@ public class DtStartTest extends DtServerProfileBase {
     private String marker;
     private String category;
     private String platform;
-    private String loadTestName;
     /**
      * Flag to print debug information. Default: false
      */
@@ -71,7 +70,7 @@ public class DtStartTest extends DtServerProfileBase {
                 additionalInformation.put(property.getKey(), property.getValue());
             }
             log(DtStartTestCommon.generateInfoMessage(getProfileName(), versionMajor, versionMinor, versionRevision,
-                    versionBuild, versionMilestone, marker, category, loadTestName, platform, additionalInformation),
+                    versionBuild, versionMilestone, marker, category, platform, additionalInformation),
                     Project.MSG_INFO);
 
             TestAutomation testAutomation = new TestAutomation(this.getDynatraceClient());
@@ -88,7 +87,6 @@ public class DtStartTest extends DtServerProfileBase {
             request.setPlatform(this.platform);
             request.setAdditionalMetaData(new TestMetaData(additionalInformation));
 
-			/* FIXME? TODO? loadTestName is not used anymore! */
             TestRun testRun = testAutomation.createTestRun(request);
 
             String testrunUUID = testRun.getId();
@@ -113,11 +111,10 @@ public class DtStartTest extends DtServerProfileBase {
         if (category == null) {
             throw new BuildException(DtStartTestCommon.MISSING_CATEGORY_MESSAGE);
         }
-        if (!DtStartTestCommon.TEST_CATEGORIES.contains(category)) {
-            throw new BuildException(MessageFormat.format(DtStartTestCommon.INVALID_CATEGORY_MESSAGE, category));
-        }
-        if (category != null && DtStartTestCommon.TEST_CATEGORY_LOAD.equalsIgnoreCase(category) && loadTestName == null) {
-            throw new BuildException(DtStartTestCommon.MISSING_LOAD_TEST_NAME_MESSAGE);
+        try {
+            TestCategory testCategory = TestCategory.fromInternal(this.category);
+        } catch(IllegalArgumentException e) {
+            throw new BuildException(MessageFormat.format(DtStartTestCommon.INVALID_CATEGORY_MESSAGE, this.category));
         }
     }
 
@@ -151,22 +148,6 @@ public class DtStartTest extends DtServerProfileBase {
         this.versionRevision = versionRevision;
     }
 
-    /**
-     * Not supported since dT 6.2
-     *
-     * @return {@code null}
-     */
-    @Deprecated
-    public final String getAgentGroup() {
-        return null;
-    }
-
-    /**
-     * Not supported since dT 6.2
-     */
-    @Deprecated
-    public final void setAgentGroup(String agentGroup) {
-    }
 
     public final String getVersionMilestone() {
         return versionMilestone;
@@ -206,26 +187,6 @@ public class DtStartTest extends DtServerProfileBase {
 
     public final void setPlatform(String platform) {
         this.platform = platform;
-    }
-
-    public final String getLoadTestName() {
-        return loadTestName;
-    }
-
-    public final void setLoadTestName(String loadTestName) {
-        this.loadTestName = loadTestName;
-    }
-
-    /**
-     * Method supporting setting load test name with old parameter 'testrunname'
-     * It's left only for compatibiliy with existing Ant scripts.
-     * Use {@link #setLoadTestName(String)} instead.
-     *
-     * @param testrunname
-     */
-    @Deprecated
-    public final void setTestrunname(String testrunname) {
-        this.loadTestName = testrunname;
     }
 
     public void setDebug(boolean debug) {
