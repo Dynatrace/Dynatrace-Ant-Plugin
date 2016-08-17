@@ -12,6 +12,7 @@ import java.net.URISyntaxException;
 public abstract class DtServerBase extends Task {
     private static final String PROTOCOL_WITHOUT_SSL = "http";
     private static final String PROTOCOL_WITH_SSL = "https";
+    private static final int CONNECTION_TIMEOUT = 0; /** unlimited timeout */
 
     private DynatraceClient dynatraceClient;
     private String username = null;
@@ -35,7 +36,7 @@ public abstract class DtServerBase extends Task {
                 throw new URISyntaxException(protocol, "Invalid protocol name in serverUrl");
             }
 
-            return new BasicServerConfiguration(this.getUsername(), this.getPassword(), ssl, host, port, !this.getIgnoreSSLErrors(), BasicServerConfiguration.DEFAULT_CONNECTION_TIMEOUT);
+            return new BasicServerConfiguration(this.getUsername(), this.getPassword(), ssl, host, port, !this.getIgnoreSSLErrors(), CONNECTION_TIMEOUT);
         } catch (URISyntaxException e) {
             throw new BuildException(e.getMessage(), e); //? proper way?
         }
