@@ -1,6 +1,7 @@
 package com.dynatrace.diagnostics.automation.ant;
 
 import com.dynatrace.sdk.org.apache.http.client.utils.URIBuilder;
+import com.dynatrace.sdk.org.apache.http.impl.client.CloseableHttpClient;
 import com.dynatrace.sdk.server.BasicServerConfiguration;
 import com.dynatrace.sdk.server.DynatraceClient;
 import org.apache.tools.ant.BuildException;
@@ -42,6 +43,11 @@ public abstract class DtServerBase extends Task {
         }
     }
 
+    /** only for testing purposes */
+    public void setDynatraceClientWithCustomHttpClient(CloseableHttpClient client) throws BuildException {
+        this.dynatraceClient = new DynatraceClient(this.buildServerConfiguration(), client);
+    }
+
     public DynatraceClient getDynatraceClient() throws BuildException {
         if (this.dynatraceClient == null) {
             this.dynatraceClient = new DynatraceClient(this.buildServerConfiguration());
@@ -78,7 +84,7 @@ public abstract class DtServerBase extends Task {
 
     public String getServerUrl() {
         if (serverUrl == null) {
-            String dtServerUrl = this.getProject().getProperty("dtServerUrl"); //$NON-NLS-1$
+;            String dtServerUrl = this.getProject().getProperty("dtServerUrl"); //$NON-NLS-1$
             if (dtServerUrl != null && dtServerUrl.length() > 0)
                 serverUrl = dtServerUrl;
         }
