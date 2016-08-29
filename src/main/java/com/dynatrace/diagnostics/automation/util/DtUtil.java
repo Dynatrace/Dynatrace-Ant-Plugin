@@ -26,29 +26,39 @@
  * DAMAGE.
  */
 
-package com.dynatrace.diagnostics.automation.ant;
+package com.dynatrace.diagnostics.automation.util;
+
+import com.dynatrace.sdk.server.testautomation.models.TestCategory;
+
+import java.util.ArrayList;
 
 /**
- * Implements property used in {@link DtStartTest}
+ * Utility methods for automation plugin
  */
-public class CustomProperty {
+public final class DtUtil {
 
-    private String key;
-    private String value;
-
-    public String getKey() {
-        return key;
+    /**
+     * Checks whether given string is null or empty
+     *
+     * @param string - string to evaluate
+     * @return {@code true} if given string is null or empty, {@code false} otherwise.
+     */
+    public static boolean isEmpty(String string) {
+        return string == null || string.isEmpty();
     }
 
-    public void setKey(final String key) {
-        this.key = key;
-    }
+    /**
+     * Lists all internal values of {@link TestCategory}
+     *
+     * @return a array that contains internal value for each {@link TestCategory}
+     */
+    public static Object[] getTestCategoryInternalValues() {
+        ArrayList<String> list = new ArrayList<>();
 
-    public String getValue() {
-        return value;
-    }
+        for (TestCategory testCategory : TestCategory.values()) {
+            list.add(testCategory.getInternal());
+        }
 
-    public void setValue(final String value) {
-        this.value = value;
+        return list.toArray();
     }
 }

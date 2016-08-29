@@ -1,5 +1,34 @@
+/*
+ * Dynatrace Ant Plugin
+ * Copyright (c) 2008-2016, DYNATRACE LLC
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *  Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *  Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *  Neither the name of the dynaTrace software nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
 package com.dynatrace.diagnostics.automation.ant;
 
+import com.dynatrace.diagnostics.automation.util.DtUtil;
 import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
 import com.dynatrace.sdk.server.exceptions.ServerResponseException;
 import com.dynatrace.sdk.server.sessions.Sessions;
@@ -9,9 +38,6 @@ import org.apache.tools.ant.BuildException;
 
 /**
  * Ant task to start session recording via the server REST-interface
- *
- * @author andreas.grabner
- * @author cwat-ruttenth
  */
 public class DtStartRecording extends DtServerProfileBase {
 
@@ -22,6 +48,11 @@ public class DtStartRecording extends DtServerProfileBase {
     private boolean sessionLocked;
     private boolean appendTimestamp;
 
+    /**
+     * Executes ant task
+     *
+     * @throws BuildException whenever connecting to the server, parsing a response or execution fails
+     */
     @Override
     public void execute() throws BuildException {
         Sessions sessions = new Sessions(this.getDynatraceClient());
@@ -38,11 +69,10 @@ public class DtStartRecording extends DtServerProfileBase {
 
         try {
             String sessionName = sessions.startRecording(startRecordingRequest);
+            this.log(String.format("Started recording on %s with SessionName %s", this.getProfileName(), sessionName));
 
-            log("Started recording on " + getProfileName() + " with SessionName " + sessionName); //$NON-NLS-1$ //$NON-NLS-2$
-
-            if (sessionNameProperty != null && sessionNameProperty.length() > 0) {
-                this.getProject().setProperty(sessionNameProperty, sessionName);
+            if (!DtUtil.isEmpty(this.getSessionNameProperty())) {
+                this.getProject().setProperty(this.getSessionNameProperty(), sessionName);
             }
         } catch (ServerConnectionException | ServerResponseException e) {
             throw new BuildException(e.getMessage(), e);
@@ -93,12 +123,15 @@ public class DtStartRecording extends DtServerProfileBase {
      * @return the name of the session the recording is started
      */
     public String getSessionNameProperty() {
-        if (sessionNameProperty == null) {
-            String dtSessionNameProperty = this.getProject().getProperty("dtSessionNameProperty"); //$NON-NLS-1$
-            if (dtSessionNameProperty != null && dtSessionNameProperty.length() > 0)
-                sessionNameProperty = dtSessionNameProperty;
+        if (this.sessionNameProperty == null) {
+            String sessionNamePropertyFromProperty = this.getProject().getProperty("dtSessionNameProperty");
+
+            if (!DtUtil.isEmpty(sessionNamePropertyFromProperty)) {
+                this.sessionNameProperty = sessionNamePropertyFromProperty;
+            }
         }
-        return sessionNameProperty;
+
+        return this.sessionNameProperty;
     }
 
     public void setSessionNameProperty(String sessionNameProperty) {

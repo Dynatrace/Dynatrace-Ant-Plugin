@@ -1,5 +1,34 @@
+/*
+ * Dynatrace Ant Plugin
+ * Copyright (c) 2008-2016, DYNATRACE LLC
+ * All rights reserved.
+ *
+ * Redistribution and use in source and binary forms, with or without modification,
+ * are permitted provided that the following conditions are met:
+ *  Redistributions of source code must retain the above copyright notice,
+ * this list of conditions and the following disclaimer.
+ *  Redistributions in binary form must reproduce the above copyright notice,
+ * this list of conditions and the following disclaimer in the documentation
+ * and/or other materials provided with the distribution.
+ *  Neither the name of the dynaTrace software nor the names of its contributors
+ * may be used to endorse or promote products derived from this software without
+ * specific prior written permission.
+ *
+ * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS" AND ANY
+ * EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
+ * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE DISCLAIMED. IN NO EVENT
+ * SHALL THE COPYRIGHT OWNER OR CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT,
+ * INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED
+ * TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR PROFITS; OR
+ * BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN
+ * CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN
+ * ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH
+ * DAMAGE.
+ */
+
 package com.dynatrace.diagnostics.automation.ant;
 
+import com.dynatrace.diagnostics.automation.util.DtUtil;
 import com.dynatrace.sdk.org.apache.http.client.utils.URIBuilder;
 import com.dynatrace.sdk.org.apache.http.impl.client.CloseableHttpClient;
 import com.dynatrace.sdk.server.BasicServerConfiguration;
@@ -10,18 +39,35 @@ import org.apache.tools.ant.Task;
 import java.net.URI;
 import java.net.URISyntaxException;
 
-public abstract class DtServerBase extends Task {
+/**
+ * Base for Ant tasks which are using server connection
+ */
+abstract class DtServerBase extends Task {
     private static final String PROTOCOL_WITHOUT_SSL = "http";
     private static final String PROTOCOL_WITH_SSL = "https";
-    private static final int CONNECTION_TIMEOUT = 0; /** unlimited timeout */
 
+    /**
+     * Use unlimited connection timeout
+     */
+    private static final int CONNECTION_TIMEOUT = 0;
+
+    private String username;
+    private String password;
+    private String serverUrl;
+    private Boolean ignoreSSLErrors;
+
+    /**
+     * contains Dynatrace client
+     */
     private DynatraceClient dynatraceClient;
-    private String username = null;
-    private String password = null;
-    private String serverUrl = null;
-    private Boolean ignoreSSLErrors = null;
 
-    private BasicServerConfiguration buildServerConfiguration() {
+    /**
+     * Builds configuration required for {@link DynatraceClient}
+     *
+     * @return {@link BasicServerConfiguration} containing configuration based on parameters provided in properties
+     * @throws BuildException whenever connecting to the server, parsing a response or execution fails
+     */
+    private BasicServerConfiguration buildServerConfiguration() throws BuildException {
         try {
             URIBuilder uriBuilder = new URIBuilder(this.getServerUrl());
             URI uri = uriBuilder.build();
@@ -29,40 +75,67 @@ public abstract class DtServerBase extends Task {
             String protocol = uri.getScheme();
             String host = uri.getHost();
             int port = uri.getPort();
-            boolean ssl = BasicServerConfiguration.DEFAULT_SSL;
-
-            if (protocol != null && (protocol.equals(PROTOCOL_WITH_SSL) || protocol.equals(PROTOCOL_WITHOUT_SSL))) {
-                ssl = protocol.equals(PROTOCOL_WITH_SSL);
-            } else {
-                throw new URISyntaxException(protocol, "Invalid protocol name in serverUrl");
-            }
+            boolean ssl = this.isProtocolCompatibleWithSsl(protocol);
 
             return new BasicServerConfiguration(this.getUsername(), this.getPassword(), ssl, host, port, !this.getIgnoreSSLErrors(), CONNECTION_TIMEOUT);
-        } catch (URISyntaxException e) {
-            throw new BuildException(e.getMessage(), e); //? proper way?
+        } catch (URISyntaxException | IllegalArgumentException e) {
+            throw new BuildException(e.getMessage(), e);
         }
     }
 
-    /** only for testing purposes */
-    public void setDynatraceClientWithCustomHttpClient(CloseableHttpClient client) throws BuildException {
-        this.dynatraceClient = new DynatraceClient(this.buildServerConfiguration(), client);
+    /**
+     * Checks whether given protocol is http (without SSL) or https (with SSL)
+     *
+     * @param protocol - protocol name extracted from url
+     * @return boolean that describes that the given protocol has SSL
+     * @throws IllegalArgumentException whenever given protocol name isn't valid (isn't http or https)
+     */
+    private boolean isProtocolCompatibleWithSsl(String protocol) throws IllegalArgumentException {
+        if (!DtUtil.isEmpty(protocol) && (protocol.equals(PROTOCOL_WITH_SSL) || protocol.equals(PROTOCOL_WITHOUT_SSL))) {
+            return protocol.equals(PROTOCOL_WITH_SSL);
+        }
+
+        throw new IllegalArgumentException(String.format("Invalid protocol name: %s", protocol), new Exception());
     }
 
+    /**
+     * Returns {@link DynatraceClient} required for Server SDK classes
+     *
+     * @return {@link DynatraceClient} with parameters provided in properties
+     * @throws BuildException whenever execution fails
+     */
     public DynatraceClient getDynatraceClient() throws BuildException {
         if (this.dynatraceClient == null) {
+            this.log(String.format("Connection to dynaTrace Server via %s with username %s, ignoring SSL errors: %b", this.getServerUrl(), this.getUsername(), this.getIgnoreSSLErrors()));
             this.dynatraceClient = new DynatraceClient(this.buildServerConfiguration());
         }
 
         return this.dynatraceClient;
     }
 
+    /**
+     * Returns {@link DynatraceClient} required for Server SDK classes
+     * <p>
+     * Used only for testing purposes
+     *
+     * @param client - user-defined {@link CloseableHttpClient}
+     * @return {@link DynatraceClient} with parameters provided in properties
+     * @throws BuildException whenever execution fails
+     */
+    public void setDynatraceClientWithCustomHttpClient(CloseableHttpClient client) throws BuildException {
+        this.log(String.format("Connection to dynaTrace Server via %s with username %s, ignoring SSL errors: %b", this.getServerUrl(), this.getUsername(), this.getIgnoreSSLErrors()));
+        this.dynatraceClient = new DynatraceClient(this.buildServerConfiguration(), client);
+    }
+
     public String getUsername() {
-        if (username == null) {
-            String dtUsername = this.getProject().getProperty("dtUsername"); //$NON-NLS-1$
-            if (dtUsername != null && dtUsername.length() > 0)
-                username = dtUsername;
+        if (this.username == null) {
+            String userNameFromProperty = this.getProject().getProperty("dtUsername");
+
+            if (!DtUtil.isEmpty(userNameFromProperty)) {
+                this.username = userNameFromProperty;
+            }
         }
-        return username;
+        return this.username;
     }
 
     public void setUsername(String username) {
@@ -70,12 +143,14 @@ public abstract class DtServerBase extends Task {
     }
 
     public String getPassword() {
-        if (password == null) {
-            String dtPassword = this.getProject().getProperty("dtPassword"); //$NON-NLS-1$
-            if (dtPassword != null && dtPassword.length() > 0)
-                password = dtPassword;
+        if (this.password == null) {
+            String passwordFromProperty = this.getProject().getProperty("dtPassword");
+
+            if (!DtUtil.isEmpty(passwordFromProperty)) {
+                this.password = passwordFromProperty;
+            }
         }
-        return password;
+        return this.password;
     }
 
     public void setPassword(String password) {
@@ -83,12 +158,14 @@ public abstract class DtServerBase extends Task {
     }
 
     public String getServerUrl() {
-        if (serverUrl == null) {
-;            String dtServerUrl = this.getProject().getProperty("dtServerUrl"); //$NON-NLS-1$
-            if (dtServerUrl != null && dtServerUrl.length() > 0)
-                serverUrl = dtServerUrl;
+        if (this.serverUrl == null) {
+            String serverUrlFromProperty = this.getProject().getProperty("dtServerUrl");
+
+            if (!DtUtil.isEmpty(serverUrlFromProperty)) {
+                this.serverUrl = serverUrlFromProperty;
+            }
         }
-        return serverUrl;
+        return this.serverUrl;
     }
 
     public void setServerUrl(String serverUrl) {
@@ -101,19 +178,19 @@ public abstract class DtServerBase extends Task {
      * in {@code dtIgnoreSSLErrors} Ant property or the default value {@code TRUE}.
      */
     public Boolean getIgnoreSSLErrors() {
-        if (ignoreSSLErrors == null) {
-            String dtIgnoreSSLErrorsProperty = this.getProject().getProperty("dtIgnoreSSLErrors"); //$NON-NLS-1$
+        if (this.ignoreSSLErrors == null) {
+            String ignoreSSLErrorsFromProperty = this.getProject().getProperty("dtIgnoreSSLErrors");
             // only override default value if property is a valid boolean string representation
             // without that malformed property value would cause returning false
-            if (Boolean.FALSE.toString().equalsIgnoreCase(dtIgnoreSSLErrorsProperty) ||
-                    Boolean.TRUE.toString().equalsIgnoreCase(dtIgnoreSSLErrorsProperty)) {
-                ignoreSSLErrors = Boolean.valueOf(dtIgnoreSSLErrorsProperty);
+            if (Boolean.FALSE.toString().equalsIgnoreCase(ignoreSSLErrorsFromProperty) || Boolean.TRUE.toString().equalsIgnoreCase(ignoreSSLErrorsFromProperty)) {
+                this.ignoreSSLErrors = Boolean.valueOf(ignoreSSLErrorsFromProperty);
             } else {
-                // malformed property value, assign default value
-                ignoreSSLErrors = Boolean.TRUE;
+                /* malformed property value, assign default value */
+                this.ignoreSSLErrors = Boolean.TRUE;
             }
         }
-        return ignoreSSLErrors;
+
+        return this.ignoreSSLErrors;
     }
 
     public void setIgnoreSSLErrors(Boolean ignoreSSLErrors) {
