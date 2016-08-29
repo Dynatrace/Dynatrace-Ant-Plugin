@@ -51,7 +51,7 @@ public class DtGetAgentInfoTest extends AbstractDynatraceTest<DtGetAgentInfo> {
         whenNew(AgentsAndCollectors.class).withAnyArguments().thenReturn(agentsAndCollectors);
 
         /** verify default values */
-       /* assertThat(this.getTask().getInfoForAgentByIndex(), is(-1));*/
+        assertThat(this.getTask().getInfoForAgentByIndex(), is(-1));
     }
 
     @Override

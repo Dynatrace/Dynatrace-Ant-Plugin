@@ -38,8 +38,8 @@ public class DtThreadDumpWithTimeoutTest extends AbstractDynatraceTest<DtThreadD
         whenNew(ResourceDumps.class).withAnyArguments().thenReturn(resourceDumps);
 
         /** verify default values */
-        /*assertThat(this.getTask().getWaitForDumpTimeout(), is(60000));
-        assertThat(this.getTask().getWaitForDumpPollingInterval(), is(5000));*/
+        assertThat(this.getTask().getWaitForDumpTimeout(), is(60000));
+        assertThat(this.getTask().getWaitForDumpPollingInterval(), is(5000));
     }
 
     @Override

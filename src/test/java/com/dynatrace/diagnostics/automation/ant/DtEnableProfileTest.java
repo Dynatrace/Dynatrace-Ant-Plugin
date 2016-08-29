@@ -10,6 +10,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -39,7 +40,7 @@ public class DtEnableProfileTest extends AbstractDynatraceTest<DtEnableProfile> 
         whenNew(SystemProfiles.class).withAnyArguments().thenReturn(systemProfiles);
 
         /** verify default values */
-/*        assertThat(this.getTask().isEnable(), is(true));*/
+        assertThat(this.getTask().isEnable(), is(true));
     }
 
     @Override
@@ -136,4 +137,5 @@ public class DtEnableProfileTest extends AbstractDynatraceTest<DtEnableProfile> 
             //assertThat(e.getMessage(), containsString("500"));
         }
     }
+
 }

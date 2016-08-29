@@ -15,6 +15,7 @@ import org.powermock.modules.junit4.PowerMockRunner;
 
 import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 import static org.powermock.api.mockito.PowerMockito.*;
@@ -51,15 +52,14 @@ public class DtMemoryDumpTest extends AbstractDynatraceTest<DtMemoryDump> {
         whenNew(MemoryDumps.class).withAnyArguments().thenReturn(memoryDumps);
 
         /** verify default values */
-        /*
-        assertThat(this.getTask().getDumpType(), is("memdump_simple"));
-        assertThat(this.getTask().isSessionLocked(), is(true));
+        assertNull(this.getTask().getDumpStatusProperty());
+        assertThat(this.getTask().isSessionLocked(), is(false));
         assertThat(this.getTask().getDoGc(), is(false));
         assertThat(this.getTask().getAutoPostProcess(), is(false));
         assertThat(this.getTask().getCapturePrimitives(), is(false));
         assertThat(this.getTask().getCaptureStrings(), is(false));
         assertThat(this.getTask().getWaitForDumpTimeout(), is(60000));
-        assertThat(this.getTask().getWaitForDumpPollingInterval(), is(5000));*/
+        assertThat(this.getTask().getWaitForDumpPollingInterval(), is(5000));
     }
 
     @Override
@@ -81,6 +81,7 @@ public class DtMemoryDumpTest extends AbstractDynatraceTest<DtMemoryDump> {
             this.getTask().setAgentName("agent-name");
             this.getTask().setHostName("host-name");
             this.getTask().setProcessId(1234);
+            this.getTask().setDumpType("memdump_simple");
 
             this.getTask().setMemoryDumpNameProperty("dump-name");
             this.getTask().setDumpStatusProperty("dump-status");
@@ -169,7 +170,7 @@ public class DtMemoryDumpTest extends AbstractDynatraceTest<DtMemoryDump> {
 
 
     @Test
-    public void testThreadDumpWithoutProperties() throws Exception {
+    public void testMemoryDumpWithoutProperties() throws Exception {
         this.applyFreshEnvironment();
 
         try {
@@ -178,6 +179,41 @@ public class DtMemoryDumpTest extends AbstractDynatraceTest<DtMemoryDump> {
             fail("Exception should be thrown");
         } catch (Exception e) {
             assertThat(e, instanceOf(NullPointerException.class));
+        }
+    }
+
+
+    @Test
+    public void testMemoryDumpProperties() throws Exception {
+        this.applyFreshEnvironment();
+
+        try {
+            this.getTask().setDumpType("memdump_simple");
+            this.getTask().setMemoryDumpNameProperty("prop");
+            this.getTask().setDumpStatusProperty("other-prop");
+            this.getTask().setCaptureStrings(true);
+            this.getTask().setCapturePrimitives(true);
+            this.getTask().setAutoPostProcess(true);
+            this.getTask().setDoGc(true);
+            this.getTask().setSessionLocked(true);
+            this.getTask().setWaitForDumpTimeout(1111);
+            this.getTask().setWaitForDumpPollingInterval(412);
+
+
+            assertThat(this.getTask().getDumpType(), is("memdump_simple"));
+            assertThat(this.getTask().getMemoryDumpNameProperty(), is("prop"));
+            assertThat(this.getTask().getDumpStatusProperty(), is("other-prop"));
+            assertThat(this.getTask().isSessionLocked(), is(true));
+            assertThat(this.getTask().getDoGc(), is(true));
+            assertThat(this.getTask().getAutoPostProcess(), is(true));
+            assertThat(this.getTask().getCapturePrimitives(), is(true));
+            assertThat(this.getTask().getCaptureStrings(), is(true));
+            assertThat(this.getTask().getWaitForDumpTimeout(), is(1111));
+            assertThat(this.getTask().getWaitForDumpPollingInterval(), is(412));
+
+
+        } catch (Exception e) {
+            fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }
     }
 }

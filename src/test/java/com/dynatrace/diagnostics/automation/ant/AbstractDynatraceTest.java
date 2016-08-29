@@ -4,7 +4,7 @@ import org.apache.tools.ant.BuildFileRule;
 import org.apache.tools.ant.Target;
 import org.apache.tools.ant.Task;
 
-public abstract class AbstractDynatraceTest<T extends DtServerBase> {
+abstract class AbstractDynatraceTest<T extends DtServerBase> {
     public static final String DEFAULT_TEST_PLUGIN_CONFIG_PATH = "src/test/resources/build.xml";
 
     private T task;

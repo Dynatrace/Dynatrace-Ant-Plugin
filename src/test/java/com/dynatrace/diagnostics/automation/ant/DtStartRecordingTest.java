@@ -39,9 +39,6 @@ public class DtStartRecordingTest extends AbstractDynatraceTest<DtStartRecording
         doThrow(new ServerConnectionException("message", new Exception())).when(sessions).startRecording(Mockito.argThat(new StartRecordingRequestProfileNameMatcher("start-recording-with-exception")));
 
         whenNew(Sessions.class).withAnyArguments().thenReturn(sessions);
-
-        /** verify default values */
-       /* assertThat(this.getTask().getRecordingOption(), is("all"));*/
     }
 
     @Override

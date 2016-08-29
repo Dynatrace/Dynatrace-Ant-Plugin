@@ -38,9 +38,6 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         doReturn(testRun).when(testAutomation).createTestRun(Mockito.any(CreateTestRunRequest.class));
 
         whenNew(TestAutomation.class).withAnyArguments().thenReturn(testAutomation);
-
-        /** verify default values */
-       /* assertThat(this.getTask().isIgnoreVersionTag(), is(false));*/
     }
 
     @Override
@@ -54,29 +51,10 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
     }
 
     @Test
-    public void testStartTestWithIgnoreVersionTag() throws Exception {
+    public void testStartTest() throws Exception {
         this.applyFreshEnvironment();
 
         try {
-
-
-            this.getTask().setVersionBuild("1");
-            this.getTask().setCategory("unit");
-
-            this.getTask().execute();
-
-            assertThat(this.getTask().getProject().getProperty("dtTestrunID"), is(EXAMPLE_TEST_RUN_ID));
-        } catch (Exception e) {
-            fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
-        }
-    }
-
-    @Test
-    public void testStartTestWithoutIgnoreVersionTag() throws Exception {
-        this.applyFreshEnvironment();
-
-        try {
-
             this.getTask().setVersionBuild("1");
             this.getTask().setCategory("unit");
 
@@ -93,9 +71,7 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         this.applyFreshEnvironment();
 
         try {
-
             this.getTask().setVersionBuild("1");
-
             this.getTask().execute();
 
             fail("Exception should be thrown - category is not set");
@@ -104,15 +80,12 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         }
     }
 
-
     @Test
-    public void testStartTestIgnoreVersionTagWithException() throws Exception {
+    public void testStartTestWithException() throws Exception {
         this.applyFreshEnvironment();
 
         try {
-
             this.getTask().setCategory("unit");
-
             this.getTask().execute();
 
             fail("Exception should be thrown - build version is not set");
@@ -126,7 +99,6 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         this.applyFreshEnvironment();
 
         try {
-
             this.getTask().setVersionBuild("");
             this.getTask().setCategory("unit");
 
@@ -143,8 +115,6 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         this.applyFreshEnvironment();
 
         try {
-
-
             this.getTask().setVersionMajor("1");
             this.getTask().setVersionMinor("2");
             this.getTask().setVersionRevision("3");

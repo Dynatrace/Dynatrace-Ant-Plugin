@@ -39,10 +39,11 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
         whenNew(Sessions.class).withAnyArguments().thenReturn(sessions);
 
         /** verify default values */
-       /* assertThat(this.getTask().isDoReanalyzeSession(), is(false));
+        assertThat(this.getTask().isDoReanalyzeSession(), is(false));
         assertThat(this.getTask().getReanalyzeSessionTimeout(), is(60000));
         assertThat(this.getTask().getReanalyzeSessionPollingInterval(), is(5000));
-        assertThat(this.getTask().getStopDelay(), is(0));*/
+        assertThat(this.getTask().getStopDelay(), is(0));
+        assertThat(this.getTask().isFailOnError(), is(true));
     }
 
     @Override

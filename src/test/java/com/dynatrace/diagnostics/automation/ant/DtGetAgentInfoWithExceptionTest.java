@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -31,7 +32,7 @@ public class DtGetAgentInfoWithExceptionTest extends AbstractDynatraceTest<DtGet
         whenNew(AgentsAndCollectors.class).withAnyArguments().thenReturn(agentsAndCollectors);
 
         /** verify default values */
-       /* assertThat(this.getTask().getInfoForAgentByIndex(), is(-1));*/
+        assertThat(this.getTask().getInfoForAgentByIndex(), is(-1));
     }
 
     @Override

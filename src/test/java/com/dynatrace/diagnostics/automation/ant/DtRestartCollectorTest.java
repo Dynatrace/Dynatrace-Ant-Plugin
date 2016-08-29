@@ -9,6 +9,7 @@ import org.junit.runner.RunWith;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -35,7 +36,7 @@ public class DtRestartCollectorTest extends AbstractDynatraceTest<DtRestartColle
         whenNew(AgentsAndCollectors.class).withAnyArguments().thenReturn(agentsAndCollectors);
 
         /** verify default values */
-       /* assertThat(this.getTask().getRestart(), is(true));*/
+        assertThat(this.getTask().isRestart(), is(true));
     }
 
     @Override

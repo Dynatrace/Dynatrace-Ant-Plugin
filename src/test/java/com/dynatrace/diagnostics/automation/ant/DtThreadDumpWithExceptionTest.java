@@ -12,6 +12,7 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
+import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -40,8 +41,8 @@ public class DtThreadDumpWithExceptionTest extends AbstractDynatraceTest<DtThrea
         whenNew(ResourceDumps.class).withAnyArguments().thenReturn(resourceDumps);
 
         /** verify default values */
-       /* assertThat(this.getTask().getWaitForDumpTimeout(), is(60000));
-        assertThat(this.getTask().getWaitForDumpPollingInterval(), is(5000));*/
+        assertThat(this.getTask().getWaitForDumpTimeout(), is(60000));
+        assertThat(this.getTask().getWaitForDumpPollingInterval(), is(5000));
     }
 
     @Override

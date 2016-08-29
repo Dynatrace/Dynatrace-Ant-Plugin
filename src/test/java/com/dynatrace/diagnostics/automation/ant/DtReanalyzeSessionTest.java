@@ -38,8 +38,8 @@ public class DtReanalyzeSessionTest extends AbstractDynatraceTest<DtReanalyzeSes
         whenNew(Sessions.class).withAnyArguments().thenReturn(sessions);
 
         /** verify default values */
-        /*assertThat(this.getTask().getReanalyzeSessionTimeout(), is(60000));
-        assertThat(this.getTask().getReanalyzeSessionPollingInterval(), is(5000));*/
+        assertThat(this.getTask().getReanalyzeSessionTimeout(), is(60000));
+        assertThat(this.getTask().getReanalyzeSessionPollingInterval(), is(5000));
     }
 
     @Override
