@@ -85,7 +85,7 @@ public class DtGetAgentInfo extends DtServerBase {
             }
 
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to get information about agent: %s", e.getMessage()), e);
         }
     }
 

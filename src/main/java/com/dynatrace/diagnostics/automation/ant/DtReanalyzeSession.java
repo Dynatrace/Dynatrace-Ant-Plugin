@@ -51,14 +51,17 @@ public class DtReanalyzeSession extends DtServerBase {
      */
     @Override
     public void execute() throws BuildException {
+        this.log(String.format("Reanalyzing '%s' session", this.sessionName));
+
         Sessions sessions = new Sessions(this.getDynatraceClient());
+
         try {
             boolean reanalyzeFinished = false;
 
             if (sessions.reanalyze(this.getSessionName())) {
                 reanalyzeFinished = sessions.getReanalysisStatus(this.sessionName);
 
-                int timeout = reanalyzeSessionTimeout;
+                int timeout = this.reanalyzeSessionTimeout;
 
                 while (!reanalyzeFinished && (timeout > 0)) {
                     try {
@@ -76,10 +79,10 @@ public class DtReanalyzeSession extends DtServerBase {
                 this.getProject().setProperty(this.reanalyzeStatusProperty, String.valueOf(reanalyzeFinished));
             }
 
+            this.log(String.format("Reanalyzing '%s' session finished %s success ", this.sessionName, (reanalyzeFinished) ? "with" : "without"));
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to reanalyze '%s' session: %s", this.sessionName, e.getMessage()), e);
         }
-
     }
 
     public int getReanalyzeSessionTimeout() {

@@ -69,13 +69,13 @@ public class DtStartRecording extends DtServerProfileBase {
 
         try {
             String sessionName = sessions.startRecording(startRecordingRequest);
-            this.log(String.format("Started recording on %s with SessionName %s", this.getProfileName(), sessionName));
+            this.log(String.format("Started recording on %s system profile with SessionName %s", this.getProfileName(), sessionName));
 
             if (!DtUtil.isEmpty(this.getSessionNameProperty())) {
                 this.getProject().setProperty(this.getSessionNameProperty(), sessionName);
             }
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to start recording in '%s' system profile: %s", this.getProfileName(), e.getMessage()), e);
         }
     }
 

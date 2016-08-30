@@ -48,12 +48,12 @@ public class DtActivateConfiguration extends DtServerProfileBase {
     @Override
     public void execute() throws BuildException {
         try {
-            this.log(String.format("Activating '%s' configuration in '%s' system profile", this.getConfiguration(), this.getProfileName()));
+            this.log(String.format("Activating '%s' configuration in '%s' system profile", this.configuration, this.getProfileName()));
 
             SystemProfiles systemProfiles = new SystemProfiles(this.getDynatraceClient());
-            systemProfiles.activateProfileConfiguration(this.getProfileName(), this.getConfiguration());
+            systemProfiles.activateProfileConfiguration(this.getProfileName(), this.configuration);
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to activate '%s' configuration in '%s' system profile: %s", this.configuration, this.getProfileName(), e.getMessage()), e);
         }
     }
 

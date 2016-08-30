@@ -60,10 +60,12 @@ public class DtStorePurePaths extends DtServerProfileBase {
             storeSessionRequest.setRecordingOption(RecordingOption.fromInternal(this.getRecordingOption()));
         }
 
+        this.log(String.format("Storing pure paths with recording option '%s' in '%s' system profile", this.recordingOption, this.getProfileName()));
+
         try {
             sessions.store(storeSessionRequest);
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to store pure paths in '%s' system profile: %s",  this.getProfileName(), e.getMessage()), e);
         }
     }
 

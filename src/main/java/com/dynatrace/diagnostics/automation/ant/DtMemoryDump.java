@@ -86,7 +86,6 @@ public class DtMemoryDump extends DtAgentBase {
             String memoryDumpLocation = memoryDumps.createMemoryDumpJob(this.getProfileName(), memoryDumpJob);
             String memoryDumpName = this.extractMemoryDumpNameFromUrl(memoryDumpLocation);
 
-
            	/* even if memory dump name isn't valid, set given property */
             if (!DtUtil.isEmpty(this.memoryDumpNameProperty)) {
                 this.getProject().setProperty(this.memoryDumpNameProperty, memoryDumpName);
@@ -120,7 +119,7 @@ public class DtMemoryDump extends DtAgentBase {
         } catch (ServerResponseException e) {
             this.log(String.format("Cannot take memory dump: %s", e.getMessage()), Project.MSG_ERR);
         } catch (ServerConnectionException | IllegalArgumentException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to take memory dump: %s", e.getMessage()), e);
         }
     }
 

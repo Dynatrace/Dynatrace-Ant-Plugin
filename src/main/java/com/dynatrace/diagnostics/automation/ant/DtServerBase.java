@@ -135,6 +135,7 @@ abstract class DtServerBase extends Task {
                 this.username = userNameFromProperty;
             }
         }
+
         return this.username;
     }
 
@@ -150,6 +151,7 @@ abstract class DtServerBase extends Task {
                 this.password = passwordFromProperty;
             }
         }
+
         return this.password;
     }
 
@@ -165,6 +167,7 @@ abstract class DtServerBase extends Task {
                 this.serverUrl = serverUrlFromProperty;
             }
         }
+
         return this.serverUrl;
     }
 

@@ -67,7 +67,7 @@ public class DtThreadDump extends DtAgentBase {
                 this.getProject().setProperty(this.threadDumpNameProperty, threadDump);
             }
 
-            int timeout = waitForDumpTimeout;
+            int timeout = this.waitForDumpTimeout;
             boolean dumpFinished = Boolean.TRUE.equals(resourceDumps.getThreadDumpStatus(this.getProfileName(), threadDump).getResultValue());
 
             while (!dumpFinished && (timeout > 0)) {
@@ -82,10 +82,10 @@ public class DtThreadDump extends DtAgentBase {
             }
 
             if (!DtUtil.isEmpty(this.dumpStatusProperty)) {
-                this.getProject().setProperty(dumpStatusProperty, String.valueOf(dumpFinished));
+                this.getProject().setProperty(this.dumpStatusProperty, String.valueOf(dumpFinished));
             }
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to create thread dump: %s", e.getMessage()), e);
         }
     }
 

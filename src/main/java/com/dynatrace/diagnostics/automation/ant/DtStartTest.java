@@ -115,11 +115,7 @@ public class DtStartTest extends DtServerProfileBase {
             this.log(MessageFormat.format(TESTRUN_ID_PROPERTY_MESSAGE, testRunUUID));
         } catch (Exception e) {
             if (this.failOnError) {
-                if (e instanceof BuildException) {
-                    throw (BuildException) e;
-                }
-
-                throw new BuildException(e.getMessage(), e);
+                throw new BuildException(String.format("Exception when executing: %s", e.getMessage()), e);
             }
 
             this.log(String.format("Exception when executing: %s", e.getMessage()), e, Project.MSG_ERR);

@@ -38,14 +38,15 @@ abstract class DtServerProfileBase extends DtServerBase {
     private String profileName;
 
     public String getProfileName() {
-        if (profileName == null) {
+        if (this.profileName == null) {
             String profileNameFromProperty = this.getProject().getProperty("dtProfile");
 
             if (!DtUtil.isEmpty(profileNameFromProperty)) {
                 this.profileName = profileNameFromProperty;
             }
         }
-        return profileName;
+
+        return this.profileName;
     }
 
     public void setProfileName(String profileName) {

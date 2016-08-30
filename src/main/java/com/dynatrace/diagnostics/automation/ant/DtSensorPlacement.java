@@ -49,9 +49,10 @@ public class DtSensorPlacement extends DtServerBase {
         AgentsAndCollectors agentsAndCollectors = new AgentsAndCollectors(this.getDynatraceClient());
 
         try {
+            this.log(String.format("Placing sensor in '%s' agent", this.agentId));
             agentsAndCollectors.placeHotSensor(this.agentId);
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(e.getMessage(), e);
+            throw new BuildException(String.format("Error while trying to place sensor in '%s' agent: ", this.agentId, e.getMessage()), e);
         }
     }
 
