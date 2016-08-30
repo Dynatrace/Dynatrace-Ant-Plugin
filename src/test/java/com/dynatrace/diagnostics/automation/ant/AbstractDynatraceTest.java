@@ -26,6 +26,7 @@ abstract class AbstractDynatraceTest<T extends DtServerBase> {
         return taskInstance;
     }
 
+    @SuppressWarnings("unchecked")
     protected void applyFreshEnvironment() throws Exception {
         this.task = (T) this.createConfiguredTask(this.createNewInstanceOfTheTask());
         this.task.setDynatraceClientWithCustomHttpClient(null);
