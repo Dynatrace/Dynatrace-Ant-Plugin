@@ -75,12 +75,6 @@ public class DtStartTest extends DtServerProfileBase {
     private String platform;
 
     /**
-     * Flag to print debug information. Default: false
-     */
-    // DO NOT REMOVE for backward compatibility!
-    private boolean debug = false;
-
-    /**
      * Flag to make this task fail on error. Default: true
      */
     private boolean failOnError = true;
