@@ -65,7 +65,7 @@ public class DtStorePurePaths extends DtServerProfileBase {
         try {
             sessions.store(storeSessionRequest);
         } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(String.format("Error while trying to store pure paths in '%s' system profile: %s",  this.getProfileName(), e.getMessage()), e);
+            throw new BuildException(String.format("Error while trying to store pure paths in '%s' system profile: %s", this.getProfileName(), e.getMessage()), e);
         }
     }
 
