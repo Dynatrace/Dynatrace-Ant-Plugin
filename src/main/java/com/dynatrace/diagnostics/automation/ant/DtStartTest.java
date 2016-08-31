@@ -63,7 +63,6 @@ public class DtStartTest extends DtServerProfileBase {
     private static final String INDENTATION_WITH_NEW_LINE = "\n\t";
     private static final String DEEP_INDENTATION_WITH_NEW_LINE = "\n\t\t";
 
-    /* properties */
     private final List<CustomProperty> properties = new ArrayList<CustomProperty>();
     private String versionMajor;
     private String versionMinor;
@@ -285,10 +284,6 @@ public class DtStartTest extends DtServerProfileBase {
 
     public final void setPlatform(String platform) {
         this.platform = platform;
-    }
-
-    public void setDebug(boolean debug) {
-        this.debug = debug;
     }
 
     public void setFailOnError(boolean failOnError) {
