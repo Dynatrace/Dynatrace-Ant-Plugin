@@ -1,4 +1,5 @@
-# Dynatrace Ant Plugin
+# Dynatrace Ant Plugin [![Build Status](https://travis-ci.org/Dynatrace/Dynatrace-Ant-Plugin.svg?branch=master)](https://travis-ci.org/Dynatrace/Dynatrace-Ant-Plugin)
+
 
 The automation plugin enables FULL Automation of Dynatrace by leveraging the REST interfaces of the Dynatrace AppMon Server. The automation plugin includes Ant tasks to execute the following actions on the Dynatrace AppMon Server:
 * Activate Configuration: Activates a configuration within a system profile
