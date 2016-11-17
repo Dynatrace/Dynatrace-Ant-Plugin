@@ -183,4 +183,14 @@
 			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
+
+	<!-- Parameters for DtFinishTest: Finish TestRun
+         systemProfile: (optional) SystemProfle of the testRun.
+         testRunId: (optional) Id of the testRun.
+    -->
+	<taskdef name="DtFinishTest" classname="com.dynatrace.diagnostics.automation.ant.DtFinishTest">
+		<classpath>
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
+		</classpath>
+	</taskdef>
 </project>
