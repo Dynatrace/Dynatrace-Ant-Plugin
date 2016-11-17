@@ -25,7 +25,7 @@
 	-->
 	<taskdef name="DtActivateConfiguration" classname="com.dynatrace.diagnostics.automation.ant.DtActivateConfiguration">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -34,7 +34,7 @@
 	-->
 	<taskdef name="DtClearSession" classname="com.dynatrace.diagnostics.automation.ant.DtClearSession">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -43,7 +43,7 @@
 	-->
 	<taskdef name="DtEnableProfile" classname="com.dynatrace.diagnostics.automation.ant.DtEnableProfile">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -57,7 +57,7 @@
 	-->
 	<taskdef name="DtGetAgentInfo" classname="com.dynatrace.diagnostics.automation.ant.DtGetAgentInfo">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -76,7 +76,7 @@
 	-->
 	<taskdef name="DtMemoryDump" classname="com.dynatrace.diagnostics.automation.ant.DtMemoryDump">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -86,7 +86,7 @@
 	-->
 	<taskdef name="DtReanalyzeSession" classname="com.dynatrace.diagnostics.automation.ant.DtReanalyzeSession">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -96,7 +96,7 @@
 	-->
 	<taskdef name="DtRestartCollector" classname="com.dynatrace.diagnostics.automation.ant.DtRestartCollector">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -105,7 +105,7 @@
 	-->
 	<taskdef name="DtRestartServer" classname="com.dynatrace.diagnostics.automation.ant.DtRestartServer">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -114,7 +114,7 @@
 	-->
 	<taskdef name="DtSensorPlacement" classname="com.dynatrace.diagnostics.automation.ant.DtSensorPlacement">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -130,7 +130,7 @@
 	-->
 	<taskdef name="DtStartTest" classname="com.dynatrace.diagnostics.automation.ant.DtStartTest">
 		<classpath>
-			<pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar"/>
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar"/>
 		</classpath>
 	</taskdef>
 
@@ -144,7 +144,7 @@
 	-->
 	<taskdef name="DtStartRecording" classname="com.dynatrace.diagnostics.automation.ant.DtStartRecording">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -155,7 +155,7 @@
 	-->
 	<taskdef name="DtStopRecording" classname="com.dynatrace.diagnostics.automation.ant.DtStopRecording">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -166,7 +166,7 @@
 	-->
 	<taskdef name="DtStorePurePaths" classname="com.dynatrace.diagnostics.automation.ant.DtStorePurePaths">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 
@@ -180,7 +180,7 @@
 	-->
 	<taskdef name="DtThreadDump" classname="com.dynatrace.diagnostics.automation.ant.DtThreadDump">
 		<classpath>
-		  <pathelement location="${dtBaseDir}/ant.plugin-6.5.0.jar" />
+			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-6.5.0.jar" />
 		</classpath>
 	</taskdef>
 </project>

@@ -1,44 +1,105 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project name="Example app with Dynatrace integration">
 	<description>Shows how to use the dynaTrace Automation Ant Tasks</description>
-	
+
 	<property name="dtBaseDir" value="../../build/dist/" />
 
 	<!-- Import the dynaTrace Automation Tasks -->
 	<import file="../../build/dist/dtTaskDefs.xml"/>
-	
+	<property name="main.build.dir" value="build/main"/>
+	<property name="main.src.dir" value="src/main/java"/>
+	<property name="test.build.dir" value="build/test"/>
+	<property name="test.src.dir" value="src/test/java"/>
+
+	<property name="dtBaseDir" value="../../build/dist/" />
 	<!-- Properties used for project purposes -->
-	<!-- 
-		*** Change properties below according to your Dynatrace configuration *** 
-			
+	<!--
+		*** Change properties below according to your Dynatrace configuration ***
+
 		agentPath - used by test phase to inject Java agent into JVM (not used directly by plugin)
-		agentMapping - agent alias passed to Java agent (not used directly by plugin)
-		systemProfile - defines system profile name used by startTest, enableProfile, activateConfiguration, ... (not used directly by plugin)
-			
+		dynaTrace.agent - agent alias passed to Java agent (not used directly by plugin)
+		dynaTrace.profile - defines system profile name used by startTest, enableProfile, activateConfiguration, ... (not used directly by plugin)
+
+		Path to agent.
+		Windows "path\to\dynaTrace\dynaTrace 6.3\agent\lib64\dtagent.dll"
+		Unix "path/to/agent/lib64/libdtagent.so"
 	-->
-	<property name="agentPath" value="C:\Program Files\dynaTrace\dynaTrace 6.3\agent\lib64\dtagent.dll" />
-	<property name="agentMapping" value="SimpleApp_SomeProfile" />
-	<property name="dynaTrace.profile" value="SomeProfile" />
-	<!-- *** *** -->
-	
+	<property name="agentPath" value="/home/michal/dt/trunk-classic/jloadtrace/agent/lib64/libdtagent.so" />
+	<property name="dynaTrace.agent" value="Test" />
+	<property name="dynaTrace.profile" value="easyTravel" />
+
+	<path id="classpath.test">
+		<pathelement location="lib/junit-4.12.jar"/>
+		<pathelement location="lib/hamcrest-core-1.3.jar"/>
+		<pathelement location="${main.build.dir}"/>
+	</path>
+
+	<target name="compile">
+		<mkdir dir="${main.build.dir}"/>
+		<javac srcdir="${main.src.dir}" destdir="${main.build.dir}" includeantruntime="false"/>
+	</target>
+
+	<target name="test-compile" depends="compile">
+		<mkdir dir="${test.build.dir}"/>
+		<javac srcdir="${test.src.dir}" destdir="${test.build.dir}" includeantruntime="false">
+			<classpath refid="classpath.test"/>
+		</javac>
+	</target>
+
+	<target name="run-test" depends="test-compile">
+		<junit printsummary="on" haltonfailure="yes" fork="true">
+			<jvmarg value="-agentpath:${agentPath}=name=${dynaTrace.agent}_${dynaTrace.profile},server=localhost,wait=5,optionTestRunIdJava=${dtTestrunID}" />
+			<classpath>
+				<path refid="classpath.test"/>
+				<pathelement location="${test.build.dir}"/>
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<batchtest>
+				<fileset dir="${test.src.dir}" includes="**/*Test.java" />
+			</batchtest>
+		</junit>
+	</target>
+
+	<target name="startTestWithAntPlugin" depends="test-compile">
+		<DtStartTest
+				versionMajor="1"
+				versionMinor="2"
+				versionRevision="3"
+				versionMilestone="4"
+				versionBuild="102"
+				category="unit">
+		</DtStartTest>
+		<junit printsummary="on" haltonfailure="yes" fork="true">
+			<jvmarg value="-agentpath:${agentPath}=name=${dynaTrace.agent}_${dynaTrace.profile},server=localhost,wait=5,optionTestRunIdJava=${dtTestrunID}" />
+			<classpath>
+				<path refid="classpath.test"/>
+				<pathelement location="${test.build.dir}"/>
+			</classpath>
+			<formatter type="brief" usefile="false" />
+			<batchtest>
+				<fileset dir="${test.src.dir}" includes="**/*Test.java" />
+			</batchtest>
+		</junit>
+	</target>
+
 	<!-- targets with Dynatrace Automation tasks -->
 	<!-- whenever given task doesn't have profile name, username, password, serverUrl... specified, it uses defaults from tasks definition xml -->
 	<target name="ActivateConfiguration">
 		<DtActivateConfiguration profileName="${dynaTrace.profile}" configuration="Default" />
 	</target>
-	
+
 	<target name="ClearSession">
 		<DtClearSession profileName="${dynaTrace.profile}" />
 	</target>
-	
+
 	<target name="EnableProfile">
 		<DtEnableProfile profileName="${dynaTrace.profile}" enable="true" />
 	</target>
-	
+
 	<target name="DisableProfile">
 		<DtEnableProfile profileName="${dynaTrace.profile}" enable="false" />
 	</target>
-	
+
 
 	<!-- Retrieves the number of Connected Agents
 		Then queries the agent information for the first connected agent and the first GoSpaceFrontend agent
@@ -50,14 +111,14 @@
 		<DtGetAgentInfo agentNameProperty="AgentName" agentHostNameProperty="AgentHost" agentProcessIdProperty="AgentProcessId" infoForAgentByIndex="0" />
 		<echo message="First Agent: ${AgentName} - ${AgentHost} - ${AgentProcessId}"></echo>
 	</target>
-	
+
 	<target name="GetAgentInfoByName">
 		<DtGetAgentInfo agentCountProperty="AgentCount" />
 
 		<DtGetAgentInfo agentNameProperty="AgentName" agentHostNameProperty="AgentHost" agentProcessIdProperty="AgentProcessId" infoForAgentByName="someName" />
 		<echo message="First Agent: ${AgentName} - ${AgentHost} - ${AgentProcessId}"></echo>
 	</target>
-	
+
 	<!-- Takes a Memory and Thread Dump from a specific agent
 		We call GetAgentInfo first that retrieves the Agent Information for which the dump gets created
 	-->
@@ -68,21 +129,21 @@
 		<DtThreadDump threadDumpNameProperty="ThreadDumpName" agentName="${AgentName}" hostName="${AgentHost}" processId="${AgentProcessId}" profileName="${dynaTrace.profile}"/>
 		<echo message="Created Thread Dump: ${ThreadDumpName}" />
 	</target>
-	
+
 	<target name="SensorPlacement">
 		<DtSensorPlacement agentId="123"/>
 	</target>
-	
+
 	<target name="StorePurePaths">
 		<DtStorePurePaths recordingOption="all" sessionLocked="false" appendTimestamp="false" />
 	</target>
-	
+
 	<!-- Start Recording a new dynaTrace Session
 		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks, e.g.: ReanalyzeSession
 	-->
 	<target name="StartRecording">
 		<DtStartRecording profileName="GoSpace" sessionNameProperty="SessionName" sessionName="AntSession" sessionDescription="This Session is triggered by an Ant Task"  />
-        <echo message="Start Recording SessionName: ${SessionName}" />
+		<echo message="Start Recording SessionName: ${SessionName}" />
 	</target>
 
 	<!-- Stops current recording
@@ -92,7 +153,7 @@
 		<!-- The stopDelay (in ms) is in there so that you can manually create some purepaths in the meantime that end up in the session -->
 		<DtStopRecording profileName="GoSpace" sessionNameProperty="SessionName" stopDelay="10000" />
 		<echo message="Stopped Recording SessionName: ${SessionName}" />
-    </target>
+	</target>
 
 	<!-- Stops current recording and also reanalizes the session
 		In this case the System Profile name comes from the global dtProfile Property
@@ -103,7 +164,7 @@
 
 		<DtStopRecording doReanalyzeSession="true" reanalyzeStatusProperty="ReanalyzeStatus" />
 		<echo message="Stopped Recording SessionName and reanalized: ${SessionName} - ${ReanalyzeStatus}" />
-    </target>
+	</target>
 
 	<!-- Reanalyzes a specific dynaTrace Session
 		We use the value stored in the SessionName property which falls set by StopRecording
@@ -122,36 +183,4 @@
 	<target name="StartStopInclReanalyze" depends="StartRecording,StopRecordingWithReanalyze" >
 	</target>
 
-	<!-- Sets Test Meta Data Information for Test Automation -->
-	<!-- Use the debug flag for more log-output -->
-	<target name="StartTestForCategorizedTest">
-		<DtStartTest
-			versionMajor="1"
-			versionMinor="2"
-			versionRevision="3"
-			versionMilestone="m4"
-			versionBuild="5"
-			marker="marker"
-			category="unit"
-			platform="Linux"/>
-
-		<echo>TestrunID: ${dtTestrunID}</echo>
-		<!-- 
-			 after registering a test run, you need to pass the dtTestrunID as an additional
-			 parameter to the agent injected into the JVM that's executing the tests.
-			 The following example assumes that dtagent property already holds basic agent
-			 definition and parameters, dtTestrunID is added as an extra parameter
-		-->
-		
-		<junit fork="no" printsummary="yes">
-			<classpath location="lib/junit-4.12.jar" />
-			<classpath location="lib/hamcrest-core-1.3.jar" />
-			<batchtest fork="yes" todir="${report.dir}">
-				<fileset dir="src/test">
-					<include name="**/*Test*.java" />
-				</fileset>
-			</batchtest>
-			<jvmarg value="-agentpath:${agentPath}=name=${dynaTrace.agentMapping},server=localhost,wait=5,optionTestRunIdJava=${dtTestrunID}" />
-		</junit>
-	</target>
 </project>

@@ -10,17 +10,17 @@ The automation plugin enables FULL Automation of Dynatrace by leveraging the RES
 * Reanalyze Stored Sessions: Triggers business transaction analysis of a stored session
 * Restart Server/Collector
 * Start/Stop Session Recording: Returns the actual recorded session name
-* Start Test: returns testrun id, allowing to inject it into Dynatrace agent parameters
+* Start Test: Returns testrun id, allowing to inject it into Dynatrace agent parameters
 * Sensor placement into agent
 * Store pure paths
 
 #### Table of Contents
 
-* [Installation](#installation)  
+* [Installation](#installation)
  * [Prerequisites](#prerequisites)
  * [Manual Installation](#manual_installation)
 * [Configuration](#configuration)
-* [Available Ant tasks](#tasks)  
+* [Available Ant tasks](#tasks)
 * [Additional Resources](#resources)
 
 ## <a name="installation"></a>Installation
@@ -30,19 +30,19 @@ The automation plugin enables FULL Automation of Dynatrace by leveraging the RES
 * Dynatrace Application Monitoring version: 6.3+
 * Ant 1.9+
 
-Find further information in the [Dynatrace community](https://community.dynatrace.com/community/display/DL/Automation+Library+%28Ant,+Ant%29+for+Dynatrace).
+Find further information in the [Automation Library (Ant, Maven) for Dynatrace](https://community.dynatrace.com/community/display/DL/Automation+Library+%28Ant,+Maven%29+for+Dynatrace).
 
 ### <a name="manual_installation"></a>Manual Installation
 
-* Download the [latest plugin]() and extract it into the `lib` folder in your project
-* There you can find dtTaskDefs.xml (defines all Ant Task) and ant.plugin-6.5.0.jar (the actual automation library)
+* Download the [latest plugin](https://github.com/Dynatrace/Dynatrace-Ant-Plugin/releases) and extract it into the `lib` folder in your project
+* There you can find dtTaskDefs.xml (defines all Ant Task) and Dynatrace-Ant-Plugin-6.5.0.jar (the actual automation library).
 Have a look at build.xml in the example directory as a sample on how to call the ant tasks
 
 ## Building
-In order to build the plugin, Gradle environment is needed to be configured in your system. Then you should be able to build package by executing `gradlew build`. Jar file with tasks definition XML should be available it `build/dist` folder
+In order to build the plugin, Gradle environment is needed to be configured in your system OR you should be able to build package by executing gradle wrapper `gradlew build` (*nix `./gradlew build`). Jar file with tasks definition XML should be available it `build/dist` folder
 
 ## <a name="configuration"></a>Configuration
-A full example can be seen in the pom.xml as part of the project available in `examples` folder.
+A full example can be seen in the build.xml as part of the project available in `examples` folder.
 
 ## <a name="tasks"></a>Available Ant tasks
 Description of Available Ant Tasks
@@ -69,9 +69,7 @@ Resource Dumps
 * DtThreadDump - Creates a Thread Dump on an agent
 
 ## <a name="resources"></a>Additional Resources
-- [Automation Library (Ant, Ant) for Dynatrace](https://community.dynatrace.com/community/display/DL/Automation+Library+%28Ant,+Ant%29+for+Dynatrace)
 - [Test Automation and Ant](https://community.dynatrace.com/community/display/DOCDT63/Test+Automation+and+Ant)
-
 - [Continuous Delivery & Test Automation](https://community.dynatrace.com/community/pages/viewpage.action?pageId=215161284)
 - [Capture Performance Data from Tests](https://community.dynatrace.com/community/display/DOCDT63/Capture+Performance+Data+from+Tests)
 - [Integrate Dynatrace in Continous Integration Builds](https://community.dynatrace.com/community/display/DOCDT63/Integrate+Dynatrace+in+Continuous+Integration+Builds)
