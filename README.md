@@ -65,6 +65,7 @@ Description of Available Ant Tasks
 #### Test Management
 * DtStartTest - Sets meta data information for the Test Automation Feature and provides the DtStartTest.testRunId necessary to support parallel builds. The DtStartTest.testRunId value needs to be passed to the agent instrumenting the JVM that's executing the tests.
 Resource Dumps
+* DtFinishTest - Finish Test Run
 * DtMemoryDump - Creates a Memory Dump for an agent
 * DtThreadDump - Creates a Thread Dump on an agent
 
