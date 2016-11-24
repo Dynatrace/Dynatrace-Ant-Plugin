@@ -185,7 +185,6 @@
 	</taskdef>
 
 	<!-- Parameters for DtFinishTest: Finish TestRun
-         systemProfile: (optional) SystemProfle of the testRun.
          testRunId: (optional) Id of the testRun.
     -->
 	<taskdef name="DtFinishTest" classname="com.dynatrace.diagnostics.automation.ant.DtFinishTest">

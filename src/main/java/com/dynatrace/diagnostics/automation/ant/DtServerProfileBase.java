@@ -35,6 +35,7 @@ import com.dynatrace.diagnostics.automation.util.DtUtil;
  */
 abstract class DtServerProfileBase extends DtServerBase {
 
+    public static final String TESTRUN_ID_PROPERTY_NAME = "dtTestrunID";
     private String profileName;
 
     public String getProfileName() {

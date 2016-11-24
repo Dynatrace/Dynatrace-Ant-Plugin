@@ -33,36 +33,29 @@ import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
 
-/**
- * Ant task to start a test run
- */
 public class DtFinishTest extends DtServerProfileBase {
 
-    public static final String TESTRUN_ID_PROPERTY_NAME = "dtTestrunID";
-    private String systemProfile = null;
     private String testRunId = null;
 
     @Override
-    public void execute() throws BuildException {
+    public void execute() {
         try {
-            TestAutomation testAutomation = new TestAutomation(this.getDynatraceClient());
-            if(systemProfile==null) {
-                systemProfile = this.getProfileName();
-            }
-            if(testRunId==null) {
+            if (testRunId == null) {
                 testRunId = this.getProject().getProperty(TESTRUN_ID_PROPERTY_NAME);
             }
-            testAutomation.finishTestRun(systemProfile,testRunId);
-            this.log(String.format("Finis testRun on profile %1$s with ID=%2$s", systemProfile,testRunId));
+            if (testRunId == null) {
+                throw new BuildException();
+            }
+            TestAutomation testAutomation = new TestAutomation(this.getDynatraceClient());
+            testAutomation.finishTestRun(this.getProfileName(), testRunId);
+
+            this.log(String.format("Finish testRun on profile %1$s with ID=%2$s", this.getProfileName(), testRunId));
         } catch (Exception e) {
+            if (testRunId == null) {
+                throw new BuildException(String.format("TestRunId cannont be null: %s", e.getMessage()), e);
+            }
             this.log(String.format("Exception when finishing testRun: %s", e.getMessage()), e, Project.MSG_ERR);
         }
-    }
-
-    public final String getSystemProfile() { return systemProfile;}
-
-    public final void setSystemProfile(String systemProfile) {
-        this.systemProfile = systemProfile;
     }
 
     public final String getTestRunId() {
@@ -72,5 +65,4 @@ public class DtFinishTest extends DtServerProfileBase {
     public final void setTestRunId(String testRunId) {
         this.testRunId = testRunId;
     }
-
 }

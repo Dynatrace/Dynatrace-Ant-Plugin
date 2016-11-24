@@ -49,7 +49,6 @@ public class DtStartTest extends DtServerProfileBase {
     /* Attributes and properties names  */
     public static final String ATTRIBUTE_TEST_BUILD = "versionBuild";
     public static final String ATTRIBUTE_TEST_CATEGORY = "testCategory";
-    public static final String TESTRUN_ID_PROPERTY_NAME = "dtTestrunID";
     public static final String DT_AGENT_TESTRUN_OPTION = "optionTestRunIdJava";
 
     /* Messages */
