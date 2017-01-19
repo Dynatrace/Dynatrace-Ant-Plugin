@@ -55,8 +55,7 @@ public class DtActivateConfigurationTest extends AbstractDynatraceTest<DtActivat
         SystemProfiles systemProfiles = spy(new SystemProfiles(this.getTask().getDynatraceClient()));
 
         /** define responses */
-        doReturn(true).when(systemProfiles).activateProfileConfiguration("profile", "config-true");
-        doReturn(false).when(systemProfiles).activateProfileConfiguration("profile", "config-false");
+        doNothing().when(systemProfiles).activateProfileConfiguration("profile", "config-true");
         doThrow(new ServerConnectionException("message", new Exception())).when(systemProfiles).activateProfileConfiguration("profile", "config-exception");
 
         whenNew(SystemProfiles.class).withAnyArguments().thenReturn(systemProfiles);
@@ -73,7 +72,7 @@ public class DtActivateConfigurationTest extends AbstractDynatraceTest<DtActivat
     }
 
     @Test
-    public void testActivateConfigurationSuccessTrue() throws Exception {
+    public void testActivateConfigurationSuccess() throws Exception {
         this.applyFreshEnvironment();
 
         try {
@@ -85,18 +84,6 @@ public class DtActivateConfigurationTest extends AbstractDynatraceTest<DtActivat
         }
     }
 
-    @Test
-    public void testActivateConfigurationSuccessFalse() throws Exception {
-        this.applyFreshEnvironment();
-
-        try {
-            this.getTask().setProfileName("profile");
-            this.getTask().setConfiguration("config-false");
-            this.getTask().execute();
-        } catch (Exception e) {
-            fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
-        }
-    }
 
     @Test
     public void testActivateConfigurationWithException() throws Exception {
