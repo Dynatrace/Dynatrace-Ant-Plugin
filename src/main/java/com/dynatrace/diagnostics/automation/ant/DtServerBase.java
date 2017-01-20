@@ -28,16 +28,17 @@
 
 package com.dynatrace.diagnostics.automation.ant;
 
-import com.dynatrace.diagnostics.automation.util.DtUtil;
-import com.dynatrace.sdk.org.apache.http.client.utils.URIBuilder;
-import com.dynatrace.sdk.org.apache.http.impl.client.CloseableHttpClient;
-import com.dynatrace.sdk.server.BasicServerConfiguration;
-import com.dynatrace.sdk.server.DynatraceClient;
+import java.net.URI;
+import java.net.URISyntaxException;
+
+import org.apache.http.client.utils.URIBuilder;
+import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Task;
 
-import java.net.URI;
-import java.net.URISyntaxException;
+import com.dynatrace.diagnostics.automation.util.DtUtil;
+import com.dynatrace.sdk.server.BasicServerConfiguration;
+import com.dynatrace.sdk.server.DynatraceClient;
 
 /**
  * Base for Ant tasks which are using server connection

@@ -28,11 +28,12 @@
 
 package com.dynatrace.diagnostics.automation.ant;
 
-import com.dynatrace.diagnostics.automation.ant.matchers.StartRecordingRequestProfileNameMatcher;
-import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
-import com.dynatrace.sdk.server.sessions.Sessions;
-import com.dynatrace.sdk.server.sessions.models.RecordingOption;
-import com.dynatrace.sdk.server.sessions.models.StartRecordingRequest;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.powermock.api.mockito.PowerMockito.*;
+
 import org.apache.tools.ant.BuildException;
 import org.junit.Before;
 import org.junit.Test;
@@ -41,11 +42,10 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.powermock.api.mockito.PowerMockito.*;
+import com.dynatrace.diagnostics.automation.ant.matchers.StartRecordingRequestProfileNameMatcher;
+import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
+import com.dynatrace.sdk.server.sessions.Sessions;
+import com.dynatrace.sdk.server.sessions.models.RecordingOption;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({Sessions.class, DtStartRecording.class})
@@ -56,7 +56,6 @@ public class DtStartRecordingTest extends AbstractDynatraceTest<DtStartRecording
     public void setUp() throws Exception {
         this.applyFreshEnvironment();
         whenNew(DtStartRecording.class).withAnyArguments().thenReturn(this.getTask());
-        StartRecordingRequest startRecordingRequest = new StartRecordingRequest("system-profile-name");
 
         Sessions sessions = spy(new Sessions(this.getTask().getDynatraceClient()));
 
@@ -106,13 +105,13 @@ public class DtStartRecordingTest extends AbstractDynatraceTest<DtStartRecording
     }
 
     @Test
-    public void testStartRecordingWithSessionNamePropertySet() throws Exception {
+    public void testStartRecordingWithSessionLocationPropertySet() throws Exception {
         this.applyFreshEnvironment();
 
         try {
 
             this.getTask().setProfileName("start-recording-success");
-            this.getTask().setSessionNameProperty("someProperty");
+            this.getTask().setSessionLocationProperty("someProperty");
 
             this.getTask().execute();
 
@@ -130,14 +129,14 @@ public class DtStartRecordingTest extends AbstractDynatraceTest<DtStartRecording
             this.getTask().setSessionName("a");
             this.getTask().setSessionDescription("b");
             this.getTask().setRecordingOption(RecordingOption.ALL.getInternal());
-            this.getTask().setSessionNameProperty("c");
+            this.getTask().setSessionLocationProperty("c");
             this.getTask().setSessionLocked(true);
             this.getTask().setAppendTimestamp(true);
 
             assertThat(this.getTask().getSessionName(), is("a"));
             assertThat(this.getTask().getSessionDescription(), is("b"));
             assertThat(this.getTask().getRecordingOption(), is(RecordingOption.ALL.getInternal()));
-            assertThat(this.getTask().getSessionNameProperty(), is("c"));
+            assertThat(this.getTask().getSessionLocationProperty(), is("c"));
             assertThat(this.getTask().isSessionLocked(), is(true));
             assertThat(this.getTask().isAppendTimestamp(), is(true));
         } catch (Exception e) {

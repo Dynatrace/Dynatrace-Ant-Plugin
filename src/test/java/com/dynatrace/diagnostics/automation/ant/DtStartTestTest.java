@@ -28,10 +28,14 @@
 
 package com.dynatrace.diagnostics.automation.ant;
 
-import com.dynatrace.sdk.server.testautomation.TestAutomation;
-import com.dynatrace.sdk.server.testautomation.models.CreateTestRunRequest;
-import com.dynatrace.sdk.server.testautomation.models.TestCategory;
-import com.dynatrace.sdk.server.testautomation.models.TestRun;
+import static org.hamcrest.core.Is.is;
+import static org.hamcrest.core.IsInstanceOf.instanceOf;
+import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
+import static org.powermock.api.mockito.PowerMockito.*;
+
+import java.util.Date;
+
 import org.apache.tools.ant.BuildException;
 import org.junit.Before;
 import org.junit.Test;
@@ -40,11 +44,10 @@ import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.hamcrest.core.Is.is;
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.powermock.api.mockito.PowerMockito.*;
+import com.dynatrace.sdk.server.testautomation.TestAutomation;
+import com.dynatrace.sdk.server.testautomation.models.CreateTestRunRequest;
+import com.dynatrace.sdk.server.testautomation.models.TestCategory;
+import com.dynatrace.sdk.server.testautomation.models.TestRun;
 
 ;
 
@@ -59,7 +62,7 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         this.applyFreshEnvironment();
         whenNew(DtStartTest.class).withAnyArguments().thenReturn(this.getTask());
 
-        TestRun testRun = new TestRun(0L, null, null, TestCategory.UNIT, EXAMPLE_TEST_RUN_ID, null, null, null, null, null, null, null, null, null, null, null, null, null);
+        TestRun testRun = new TestRun(new Date(0L), null, null, TestCategory.UNIT, EXAMPLE_TEST_RUN_ID, null, null, null, null, null, null, null, null, null, null, null, null, null);
         TestAutomation testAutomation = spy(new TestAutomation(this.getTask().getDynatraceClient()));
 
         /** define responses */

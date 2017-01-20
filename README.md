@@ -3,15 +3,10 @@
 
 The automation plugin enables FULL Automation of Dynatrace by leveraging the REST interfaces of the Dynatrace AppMon Server. The automation plugin includes Ant tasks to execute the following actions on the Dynatrace AppMon Server:
 * Activate Configuration: Activates a configuration within a system profile
-* Clear Session: Clears the live session
 * Enable/Disable Profile
-* Get Agent Information: Either returns the number of connected agents or specific information about a single agent
-* Create Memory/Thread Dumps: Triggers memory or thread dumps for a specific connected agent
-* Reanalyze Stored Sessions: Triggers business transaction analysis of a stored session
-* Restart Server/Collector
+* Restart Server
 * Start/Stop Session Recording: Returns the actual recorded session name
 * Start Test: Returns testrun id, allowing to inject it into Dynatrace agent parameters
-* Sensor placement into agent
 * Store pure paths
 
 #### Table of Contents
@@ -27,7 +22,7 @@ The automation plugin enables FULL Automation of Dynatrace by leveraging the RES
 
 ### <a name="prerequisites"></a>Prerequisites
 
-* Dynatrace Application Monitoring version: 6.3+
+* Dynatrace Application Monitoring version: 7.0+
 * Ant 1.9+
 
 Find further information in the [Automation Library (Ant, Maven) for Dynatrace](https://community.dynatrace.com/community/display/DL/Automation+Library+%28Ant,+Maven%29+for+Dynatrace).
@@ -35,7 +30,7 @@ Find further information in the [Automation Library (Ant, Maven) for Dynatrace](
 ### <a name="manual_installation"></a>Manual Installation
 
 * Download the [latest plugin](https://github.com/Dynatrace/Dynatrace-Ant-Plugin/releases) and extract it into the `lib` folder in your project
-* There you can find dtTaskDefs.xml (defines all Ant Task) and Dynatrace-Ant-Plugin-6.5.0.jar (the actual automation library).
+* There you can find dtTaskDefs.xml (defines all Ant Task) and Dynatrace-Ant-Plugin-7.0.0.jar (the actual automation library).
 Have a look at build.xml in the example directory as a sample on how to call the ant tasks
 
 ## Building
@@ -48,17 +43,12 @@ A full example can be seen in the build.xml as part of the project available in 
 Description of Available Ant Tasks
 
 #### Server Management
-* DtSensorPlacement - Performs a Hot Sensor Placement
-* DtGetAgentInfo - Returns information about a connected Agent
 * DtEnableProfile - Enables or disables a System Profile
 * DtActivateConfiguration - Activates a Configuration of a System Profile
 * DtRestartServer - Restarts a dynaTrace Server
-* DtRestartCollector - Restarts a collector
 * DtStorePurePaths - Store current Live Session
 
 #### Session Management
-* DtClearSession - Clears the Live Session of a System Profile
-* DtReanalyzeSession - Reanalyzes a stored session
 * DtStartRecording - Starts session recording for a specified system profile
 * DtStopRecording - Stops session recording for a specified system profile
 
@@ -66,8 +56,6 @@ Description of Available Ant Tasks
 * DtStartTest - Sets meta data information for the Test Automation Feature and provides the DtStartTest.testRunId necessary to support parallel builds. The DtStartTest.testRunId value needs to be passed to the agent instrumenting the JVM that's executing the tests.
 Resource Dumps
 * DtFinishTest - Finish Test Run
-* DtMemoryDump - Creates a Memory Dump for an agent
-* DtThreadDump - Creates a Thread Dump on an agent
 
 ## <a name="resources"></a>Additional Resources
 - [Test Automation and Ant](https://community.dynatrace.com/community/display/DOCDT63/Test+Automation+and+Ant)

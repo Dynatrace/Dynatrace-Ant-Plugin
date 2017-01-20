@@ -28,20 +28,18 @@
 
 package com.dynatrace.diagnostics.automation.ant;
 
-import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
-import com.dynatrace.sdk.server.exceptions.ServerResponseException;
-import com.dynatrace.sdk.server.testautomation.TestAutomation;
-import com.dynatrace.sdk.server.testautomation.models.TestRun;
+import static org.powermock.api.mockito.PowerMockito.*;
+
 import org.apache.tools.ant.BuildException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
-
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
-import static org.powermock.api.mockito.PowerMockito.*;
-import static org.powermock.api.mockito.PowerMockito.spy;
+
+import com.dynatrace.sdk.server.testautomation.TestAutomation;
+import com.dynatrace.sdk.server.testautomation.models.TestRun;
 
 @RunWith(PowerMockRunner.class)
 @PrepareForTest({TestAutomation.class, DtFinishTest.class})

@@ -21,10 +21,10 @@
 		dynaTrace.profile - defines system profile name used by startTest, enableProfile, activateConfiguration, ... (not used directly by plugin)
 
 		Path to agent.
-		Windows "path\to\dynaTrace\dynaTrace 6.3\agent\lib64\dtagent.dll"
-		Unix "path/to/agent/lib64/libdtagent.so"
+		Windows "C:\Program Files\dynaTrace\dynaTrace 6.5\agent\lib64\dtagent.dll"
+		Unix "/opt/dynatrace-6.5/agent/lib64/libdtagent.so"
 	-->
-	<property name="agentPath" value="/home/michal/dt/trunk-classic/jloadtrace/agent/lib64/libdtagent.so" />
+	<property name="agentPath" value="C:/workspaces/dynatrace/jloadtrace/agent/lib64/dtagent.dll" />
 	<property name="dynaTrace.agent" value="Test" />
 	<property name="dynaTrace.profile" value="easyTravel" />
 
@@ -88,50 +88,12 @@
 		<DtActivateConfiguration profileName="${dynaTrace.profile}" configuration="Default" />
 	</target>
 
-	<target name="ClearSession">
-		<DtClearSession profileName="${dynaTrace.profile}" />
-	</target>
-
 	<target name="EnableProfile">
 		<DtEnableProfile profileName="${dynaTrace.profile}" enable="true" />
 	</target>
 
 	<target name="DisableProfile">
 		<DtEnableProfile profileName="${dynaTrace.profile}" enable="false" />
-	</target>
-
-
-	<!-- Retrieves the number of Connected Agents
-		Then queries the agent information for the first connected agent and the first GoSpaceFrontend agent
-		The requested information is stored in Ant Properties that can later be used by other tasks, e.g.: DtMemoryDump to identify the agent
-	 -->
-	<target name="GetAgentInfoByIndex">
-		<DtGetAgentInfo agentCountProperty="AgentCount" />
-
-		<DtGetAgentInfo agentNameProperty="AgentName" agentHostNameProperty="AgentHost" agentProcessIdProperty="AgentProcessId" infoForAgentByIndex="0" />
-		<echo message="First Agent: ${AgentName} - ${AgentHost} - ${AgentProcessId}"></echo>
-	</target>
-
-	<target name="GetAgentInfoByName">
-		<DtGetAgentInfo agentCountProperty="AgentCount" />
-
-		<DtGetAgentInfo agentNameProperty="AgentName" agentHostNameProperty="AgentHost" agentProcessIdProperty="AgentProcessId" infoForAgentByName="someName" />
-		<echo message="First Agent: ${AgentName} - ${AgentHost} - ${AgentProcessId}"></echo>
-	</target>
-
-	<!-- Takes a Memory and Thread Dump from a specific agent
-		We call GetAgentInfo first that retrieves the Agent Information for which the dump gets created
-	-->
-	<target name="TakeMemoryAndThreadDumps" depends="GetAgentInfoByIndex" >
-		<DtMemoryDump memoryDumpNameProperty="MemoryDumpName" agentName="${AgentName}" hostName="${AgentHost}" processId="${AgentProcessId}" profileName="${dynaTrace.profile}" />
-		<echo message="Created Memory Dump: ${MemoryDumpName}" />
-
-		<DtThreadDump threadDumpNameProperty="ThreadDumpName" agentName="${AgentName}" hostName="${AgentHost}" processId="${AgentProcessId}" profileName="${dynaTrace.profile}"/>
-		<echo message="Created Thread Dump: ${ThreadDumpName}" />
-	</target>
-
-	<target name="SensorPlacement">
-		<DtSensorPlacement agentId="123"/>
 	</target>
 
 	<target name="StorePurePaths">
@@ -142,8 +104,8 @@
 		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks, e.g.: ReanalyzeSession
 	-->
 	<target name="StartRecording">
-		<DtStartRecording profileName="GoSpace" sessionNameProperty="SessionName" sessionName="AntSession" sessionDescription="This Session is triggered by an Ant Task"  />
-		<echo message="Start Recording SessionName: ${SessionName}" />
+		<DtStartRecording profileName="easyTravel" sessionLocationProperty="SessionLocation" sessionName="AntSession" sessionDescription="This Session is triggered by an Ant Task"  />
+		<echo message="Start Recording SessionLocation: ${SessionLocation}" />
 	</target>
 
 	<!-- Stops current recording
@@ -151,36 +113,12 @@
 	-->
 	<target name="StopRecording">
 		<!-- The stopDelay (in ms) is in there so that you can manually create some purepaths in the meantime that end up in the session -->
-		<DtStopRecording profileName="GoSpace" sessionNameProperty="SessionName" stopDelay="10000" />
-		<echo message="Stopped Recording SessionName: ${SessionName}" />
+		<DtStopRecording profileName="easyTravel" sessionLocationProperty="SessionLocation" stopDelay="10000" />
+		<echo message="Stopped Recording SessionLocation: ${SessionLocation}" />
 	</target>
 
-	<!-- Stops current recording and also reanalizes the session
-		In this case the System Profile name comes from the global dtProfile Property
-	-->
-	<target name="StopRecordingWithReanalyze">
-		<!-- The sleep is in there so that you can manually create some purepaths in the meantime that end up in the session -->
-		<sleep seconds="10"/>
-
-		<DtStopRecording doReanalyzeSession="true" reanalyzeStatusProperty="ReanalyzeStatus" />
-		<echo message="Stopped Recording SessionName and reanalized: ${SessionName} - ${ReanalyzeStatus}" />
-	</target>
-
-	<!-- Reanalyzes a specific dynaTrace Session
-		We use the value stored in the SessionName property which falls set by StopRecording
-	-->
-	<target name="ReanalyzeSession">
-		<DtReanalyzeSession sessionName="${SessionName}" reanalyzeStatusProperty="ReanalyzeStatus" reanalyzeSessionTimeout="60000" reanalyzeSessionPollingInterval="5000" />
-
-		<echo message="Reanalyze finished? ${ReanalyzeStatus}" />
-	</target>
-
-	<!-- Combines the calls to Start/Stop and Reanalyze -->
-	<target name="StartStopRecordingAndReanalyze" depends="StartRecording,StopRecording,ReanalyzeSession" >
-	</target>
-
-	<!-- Combines the calls to Start and StopWithReanalyze -->
-	<target name="StartStopInclReanalyze" depends="StartRecording,StopRecordingWithReanalyze" >
+	<!-- Combines the calls to Start and Stop recording -->
+	<target name="StartStopRecording" depends="StartRecording,StopRecording" >
 	</target>
 
 </project>
