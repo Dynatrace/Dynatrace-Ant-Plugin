@@ -104,8 +104,8 @@
 		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks, e.g.: ReanalyzeSession
 	-->
 	<target name="StartRecording">
-		<DtStartRecording profileName="easyTravel" sessionLocationProperty="SessionLocation" sessionName="AntSession" sessionDescription="This Session is triggered by an Ant Task"  />
-		<echo message="Start Recording SessionLocation: ${SessionLocation}" />
+		<DtStartRecording profileName="easyTravel" sessionUriProperty="SessionUri" sessionName="AntSession" sessionDescription="This Session is triggered by an Ant Task"  />
+		<echo message="Start Recording SessionUri: ${SessionUri}" />
 	</target>
 
 	<!-- Stops current recording
@@ -113,8 +113,8 @@
 	-->
 	<target name="StopRecording">
 		<!-- The stopDelay (in ms) is in there so that you can manually create some purepaths in the meantime that end up in the session -->
-		<DtStopRecording profileName="easyTravel" sessionLocationProperty="SessionLocation" stopDelay="10000" />
-		<echo message="Stopped Recording SessionLocation: ${SessionLocation}" />
+		<DtStopRecording profileName="easyTravel" sessionUriProperty="SessionUri" stopDelay="10000" />
+		<echo message="Stopped Recording SessionUri: ${SessionUri}" />
 	</target>
 
 	<!-- Combines the calls to Start and Stop recording -->

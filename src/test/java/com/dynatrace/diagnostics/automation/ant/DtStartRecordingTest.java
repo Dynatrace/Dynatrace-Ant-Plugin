@@ -105,13 +105,13 @@ public class DtStartRecordingTest extends AbstractDynatraceTest<DtStartRecording
     }
 
     @Test
-    public void testStartRecordingWithSessionLocationPropertySet() throws Exception {
+    public void testStartRecordingWithSessionUriPropertySet() throws Exception {
         this.applyFreshEnvironment();
 
         try {
 
             this.getTask().setProfileName("start-recording-success");
-            this.getTask().setSessionLocationProperty("someProperty");
+            this.getTask().setSessionUriProperty("someProperty");
 
             this.getTask().execute();
 
@@ -129,14 +129,14 @@ public class DtStartRecordingTest extends AbstractDynatraceTest<DtStartRecording
             this.getTask().setSessionName("a");
             this.getTask().setSessionDescription("b");
             this.getTask().setRecordingOption(RecordingOption.ALL.getInternal());
-            this.getTask().setSessionLocationProperty("c");
+            this.getTask().setSessionUriProperty("c");
             this.getTask().setSessionLocked(true);
             this.getTask().setAppendTimestamp(true);
 
             assertThat(this.getTask().getSessionName(), is("a"));
             assertThat(this.getTask().getSessionDescription(), is("b"));
             assertThat(this.getTask().getRecordingOption(), is(RecordingOption.ALL.getInternal()));
-            assertThat(this.getTask().getSessionLocationProperty(), is("c"));
+            assertThat(this.getTask().getSessionUriProperty(), is("c"));
             assertThat(this.getTask().isSessionLocked(), is(true));
             assertThat(this.getTask().isAppendTimestamp(), is(true));
         } catch (Exception e) {

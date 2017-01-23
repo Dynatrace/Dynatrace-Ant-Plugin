@@ -40,7 +40,7 @@ import org.apache.tools.ant.Project;
  */
 public class DtStopRecording extends DtServerProfileBase {
 
-    private String sessionLocationProperty;
+    private String sessionUriProperty;
     private int stopDelay = 0;
     private boolean failOnError = true;
 
@@ -65,8 +65,8 @@ public class DtStopRecording extends DtServerProfileBase {
 
             this.log(String.format("Stopped recording on %1$s with SessionName %2$s", getProfileName(), sessionName));
 
-            if (!DtUtil.isEmpty(this.getSessionLocationProperty())) {
-                this.getProject().setProperty(this.getSessionLocationProperty(), sessionName);
+            if (!DtUtil.isEmpty(this.getSessionUriProperty())) {
+                this.getProject().setProperty(this.getSessionUriProperty(), sessionName);
             }
 
         } catch (RuntimeException e) {
@@ -80,20 +80,20 @@ public class DtStopRecording extends DtServerProfileBase {
         }
     }
 
-    public String getSessionLocationProperty() {
-        if (this.sessionLocationProperty == null) {
-            String sessionLocationPropertyFromProperty = this.getProject().getProperty("dtSessionLocationProperty");
+    public String getSessionUriProperty() {
+        if (this.sessionUriProperty == null) {
+            String sessionUriPropertyFromProperty = this.getProject().getProperty("dtSessionUriProperty");
 
-            if (!DtUtil.isEmpty(sessionLocationPropertyFromProperty)) {
-                this.sessionLocationProperty = sessionLocationPropertyFromProperty;
+            if (!DtUtil.isEmpty(sessionUriPropertyFromProperty)) {
+                this.sessionUriProperty = sessionUriPropertyFromProperty;
             }
         }
 
-        return this.sessionLocationProperty;
+        return this.sessionUriProperty;
     }
 
-    public void setSessionLocationProperty(String sessionLocationProperty) {
-        this.sessionLocationProperty = sessionLocationProperty;
+    public void setSessionUriProperty(String sessionUriProperty) {
+        this.sessionUriProperty = sessionUriProperty;
     }
 
     public int getStopDelay() {

@@ -17,8 +17,8 @@
 	<property name="dtProfile" value="easyTravel" />
 	<property name="dtIgnoreSSLErrors" value="true" />
 
-	<!-- dtSessionLocationProperty: Ant Property that will be used to store the Session Location for e.g.: Start/Stop Recording -->
-	<property name="dtSessionLocationProperty" value="SessionLocation" />
+	<!-- dtSessionUriProperty: Ant Property that will be used to store the Session Uri for e.g.: Start/Stop Recording -->
+	<property name="dtSessionUriProperty" value="SessionUri" />
 
 	<!-- Define the dynaTrace Ant Tasks -->
 	<!-- Parameters for dtActivateConfiguration: Activates a Configuration of a System Profile
@@ -70,7 +70,7 @@
 		 recordingOption: all,violations,timeseries
 		 sessionLocked: if true, session will be locked
 		 appendTimestamp: if true, a timestamp will be appended to the session name
-		 sessionLocationProperty: ant property that will retrieve the actual generated session location
+		 sessionUriProperty: ant property that will retrieve the actual generated session uri
 	-->
 	<taskdef name="DtStartRecording" classname="com.dynatrace.diagnostics.automation.ant.DtStartRecording">
 		<classpath>
@@ -79,7 +79,7 @@
 	</taskdef>
 
 	<!-- Parameters for dtStopRecording: Stops session recording on the passed System Profile
-		 sessionLocationProperty: name of the property that retrieves the name of the stored session
+		 sessionUriProperty: name of the property that retrieves the name of the stored session
 		 doReanalyzeSession: true to automatically reanalyze the session
 		 stopDelay: how long to delay session recording after this call
 	-->
