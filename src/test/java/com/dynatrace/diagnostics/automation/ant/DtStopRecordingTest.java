@@ -58,7 +58,7 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
         Sessions sessions = spy(new Sessions(this.getTask().getDynatraceClient()));
 
         /** define responses */
-        doReturn("example-session-location").when(sessions).stopRecording("stop-recording");
+        doReturn("example-session-uri").when(sessions).stopRecording("stop-recording");
 
         doThrow(new ServerConnectionException("message", new Exception())).when(sessions).stopRecording("stop-recording-with-exception");
 
@@ -85,12 +85,12 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
 
         try {
 
-            this.getTask().getProject().setProperty("dtSessionLocationProperty", "other-session-location-property");
-            this.getTask().setSessionLocationProperty("session-location-property");
+            this.getTask().getProject().setProperty("dtSessionUriProperty", "other-session-uri-property");
+            this.getTask().setSessionUriProperty("session-uri-property");
             this.getTask().setProfileName("stop-recording");
             this.getTask().execute();
 
-            assertThat(this.getTask().getProject().getProperty("session-location-property"), is("example-session-location"));
+            assertThat(this.getTask().getProject().getProperty("session-uri-property"), is("example-session-uri"));
         } catch (Exception e) {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }
@@ -98,16 +98,16 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
 
 
     @Test
-    public void testStopRecordingWithSessionLocationPropertyFromProject() throws Exception {
+    public void testStopRecordingWithSessionUriPropertyFromProject() throws Exception {
         this.applyFreshEnvironment();
 
         try {
 
-            this.getTask().getProject().setProperty("dtSessionLocationProperty", "session-name-property");
+            this.getTask().getProject().setProperty("dtSessionUriProperty", "session-uri-property");
             this.getTask().setProfileName("stop-recording");
             this.getTask().execute();
 
-            assertThat(this.getTask().getProject().getProperty("session-name-property"), is("example-session-location"));
+            assertThat(this.getTask().getProject().getProperty("session-uri-property"), is("example-session-uri"));
         } catch (Exception e) {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }
@@ -134,10 +134,10 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
 
         try {
             this.getTask().setStopDelay(2500);
-            this.getTask().setSessionLocationProperty("abc");
+            this.getTask().setSessionUriProperty("abc");
 
             assertThat(this.getTask().getStopDelay(), is(2500));
-            assertThat(this.getTask().getSessionLocationProperty(), is("abc"));
+            assertThat(this.getTask().getSessionUriProperty(), is("abc"));
 
         } catch (Exception e) {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));

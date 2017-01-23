@@ -44,7 +44,7 @@ public class DtStartRecording extends DtServerProfileBase {
     private String sessionName;
     private String sessionDescription;
     private String recordingOption;
-    private String sessionLocationProperty;
+    private String sessionUriProperty;
     private boolean sessionLocked;
     private boolean appendTimestamp;
 
@@ -68,11 +68,11 @@ public class DtStartRecording extends DtServerProfileBase {
         }
 
         try {
-            String sessionLocation = sessions.startRecording(startRecordingRequest);
-            this.log(String.format("Started recording on %s system profile with session location %s", this.getProfileName(), sessionLocation));
+            String sessionUri = sessions.startRecording(startRecordingRequest);
+            this.log(String.format("Started recording on %s system profile with session URI %s", this.getProfileName(), sessionUri));
 
-            if (!DtUtil.isEmpty(this.getSessionLocationProperty())) {
-                this.getProject().setProperty(this.getSessionLocationProperty(), sessionLocation);
+            if (!DtUtil.isEmpty(this.getSessionUriProperty())) {
+                this.getProject().setProperty(this.getSessionUriProperty(), sessionUri);
             }
         } catch (ServerConnectionException | ServerResponseException e) {
             throw new BuildException(String.format("Error while trying to start recording in '%s' system profile: %s", this.getProfileName(), e.getMessage()), e);
@@ -122,19 +122,19 @@ public class DtStartRecording extends DtServerProfileBase {
     /**
      * @return the name of the session the recording is started
      */
-    public String getSessionLocationProperty() {
-        if (this.sessionLocationProperty == null) {
-            String sessionLocationPropertyFromProperty = this.getProject().getProperty("dtSessionLocationProperty");
+    public String getSessionUriProperty() {
+        if (this.sessionUriProperty == null) {
+            String sessionUriPropertyFromProperty = this.getProject().getProperty("dtSessionUriProperty");
 
-            if (!DtUtil.isEmpty(sessionLocationPropertyFromProperty)) {
-                this.sessionLocationProperty = sessionLocationPropertyFromProperty;
+            if (!DtUtil.isEmpty(sessionUriPropertyFromProperty)) {
+                this.sessionUriProperty = sessionUriPropertyFromProperty;
             }
         }
 
-        return this.sessionLocationProperty;
+        return this.sessionUriProperty;
     }
 
-    public void setSessionLocationProperty(String sessionLocationProperty) {
-        this.sessionLocationProperty = sessionLocationProperty;
+    public void setSessionUriProperty(String sessionUriProperty) {
+        this.sessionUriProperty = sessionUriProperty;
     }
 }

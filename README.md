@@ -5,7 +5,7 @@ The automation plugin enables FULL Automation of Dynatrace by leveraging the RES
 * Activate Configuration: Activates a configuration within a system profile
 * Enable/Disable Profile
 * Restart Server
-* Start/Stop Session Recording: Returns the actual recorded session name
+* Start/Stop Session Recording: Returns the actual recorded session URI
 * Start Test: Returns testrun id, allowing to inject it into Dynatrace agent parameters
 * Store pure paths
 
