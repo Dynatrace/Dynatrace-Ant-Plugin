@@ -32,14 +32,17 @@ import static org.hamcrest.core.Is.is;
 import static org.hamcrest.core.IsInstanceOf.instanceOf;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
+import static org.mockito.Mockito.verify;
 import static org.powermock.api.mockito.PowerMockito.*;
 
 import java.util.Date;
 
+import com.dynatrace.sdk.server.testautomation.models.TestMetricFilter;
 import org.apache.tools.ant.BuildException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.ArgumentCaptor;
 import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
@@ -56,6 +59,7 @@ import com.dynatrace.sdk.server.testautomation.models.TestRun;
 public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
     private static final String START_TEST_TARGET_NAME = "startTest";
     private static final String EXAMPLE_TEST_RUN_ID = "7f98a064-d00d-4224-8803-2f87f4988584";
+    private TestAutomation testAutomation;
 
     @Before
     public void setUp() throws Exception {
@@ -63,7 +67,7 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
         whenNew(DtStartTest.class).withAnyArguments().thenReturn(this.getTask());
 
         TestRun testRun = new TestRun(new Date(0L), null, null, TestCategory.UNIT, EXAMPLE_TEST_RUN_ID, null, null, null, null, null, null, null, null, null, null, null, null, null);
-        TestAutomation testAutomation = spy(new TestAutomation(this.getTask().getDynatraceClient()));
+        testAutomation = spy(new TestAutomation(this.getTask().getDynatraceClient()));
 
         /** define responses */
         doReturn(testRun).when(testAutomation).createTestRun(Mockito.any(CreateTestRunRequest.class));
@@ -168,4 +172,26 @@ public class DtStartTestTest extends AbstractDynatraceTest<DtStartTest> {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }
     }
+
+
+    @Test
+    public void testStartTestWithMetricsFilterPassed() throws Exception {
+        this.applyFreshEnvironment();
+
+        this.getTask().setVersionBuild("1");
+        this.getTask().setCategory("unit");
+
+        this.getTask().addMetricFilter(new TestMetricFilter("group 1", "metric 1"));
+
+        ArgumentCaptor<CreateTestRunRequest> captor = ArgumentCaptor.forClass(CreateTestRunRequest.class);
+
+        this.getTask().execute();
+
+        verify(testAutomation).createTestRun(captor.capture());
+        assertThat(captor.getAllValues().size(), is(1));
+        assertThat(captor.getAllValues().get(0).getIncludedMetrics().size(), is(1));
+        assertThat(captor.getAllValues().get(0).getIncludedMetrics().get(0).getGroup(), is("group 1"));
+        assertThat(captor.getAllValues().get(0).getIncludedMetrics().get(0).getMetric(), is("metric 1"));
+    }
+
 }

@@ -39,6 +39,11 @@
 		</classpath>
 	</taskdef>
 
+	<typedef name="metricFilter" classname="com.dynatrace.sdk.server.testautomation.models.TestMetricFilter"
+			 classpath="${dtBaseDir}/Dynatrace-Ant-Plugin-${dtLibVersion}.jar">
+
+	</typedef>
+
 	<!-- Parameters for dtRestartServer: restarts a dynaTrace Server
 		 restart: true to perform the restart
 	-->
@@ -62,6 +67,7 @@
 		<classpath>
 			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-${dtLibVersion}.jar"/>
 		</classpath>
+
 	</taskdef>
 
 	<!-- Parameters for DtStartRecording: starts session recording

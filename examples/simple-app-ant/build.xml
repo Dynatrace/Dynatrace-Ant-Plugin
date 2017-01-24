@@ -68,6 +68,12 @@
 				versionMilestone="4"
 				versionBuild="102"
 				category="unit">
+
+			<customproperty  key="testKey" value="value" />
+
+			<!-- tests with given metrics will be included within test run, all tests will be included if no metric filter is specified -->
+			<metricfilter group="Error Detection" metric="Failed Transaction Count"/>
+
 		</DtStartTest>
 		<junit printsummary="on" haltonfailure="yes" fork="true">
 			<jvmarg value="-agentpath:${agentPath}=name=${dynaTrace.agent}_${dynaTrace.profile},server=localhost,wait=5,optionTestRunIdJava=${dtTestrunID}" />
