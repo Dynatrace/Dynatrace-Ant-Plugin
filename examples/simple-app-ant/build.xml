@@ -107,7 +107,7 @@
 	</target>
 
 	<!-- Start Recording a new dynaTrace Session
-		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks, e.g.: ReanalyzeSession
+		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks
 	-->
 	<target name="StartRecording">
 		<DtStartRecording profileName="easyTravel" sessionUriProperty="SessionUri" sessionName="AntSession" sessionDescription="This Session is triggered by an Ant Task"  />
@@ -115,7 +115,7 @@
 	</target>
 
 	<!-- Stops current recording
-		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks, e.g.: ReanalyzeSession
+		The actual session name will be stored in the Ant Property "SessionName" which can later be used as input for other tasks
 	-->
 	<target name="StopRecording">
 		<!-- The stopDelay (in ms) is in there so that you can manually create some purepaths in the meantime that end up in the session -->

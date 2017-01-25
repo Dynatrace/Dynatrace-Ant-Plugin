@@ -86,7 +86,6 @@
 
 	<!-- Parameters for dtStopRecording: Stops session recording on the passed System Profile
 		 sessionUriProperty: name of the property that retrieves the name of the stored session
-		 doReanalyzeSession: true to automatically reanalyze the session
 		 stopDelay: how long to delay session recording after this call
 	-->
 	<taskdef name="DtStopRecording" classname="com.dynatrace.diagnostics.automation.ant.DtStopRecording">
