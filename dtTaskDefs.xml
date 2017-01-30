@@ -39,6 +39,11 @@
 		</classpath>
 	</taskdef>
 
+	<typedef name="metricFilter" classname="com.dynatrace.sdk.server.testautomation.models.TestMetricFilter"
+			 classpath="${dtBaseDir}/Dynatrace-Ant-Plugin-${dtLibVersion}.jar">
+
+	</typedef>
+
 	<!-- Parameters for dtRestartServer: restarts a dynaTrace Server
 		 restart: true to perform the restart
 	-->
@@ -62,6 +67,7 @@
 		<classpath>
 			<pathelement location="${dtBaseDir}/Dynatrace-Ant-Plugin-${dtLibVersion}.jar"/>
 		</classpath>
+
 	</taskdef>
 
 	<!-- Parameters for DtStartRecording: starts session recording
@@ -80,7 +86,6 @@
 
 	<!-- Parameters for dtStopRecording: Stops session recording on the passed System Profile
 		 sessionUriProperty: name of the property that retrieves the name of the stored session
-		 doReanalyzeSession: true to automatically reanalyze the session
 		 stopDelay: how long to delay session recording after this call
 	-->
 	<taskdef name="DtStopRecording" classname="com.dynatrace.diagnostics.automation.ant.DtStopRecording">
