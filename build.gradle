@@ -58,7 +58,7 @@ shadowJar.finalizedBy dist
 
 /* compile and testing dependencies */
 dependencies {
-	compileAndIncludeInJar fileTree(dir: 'lib', include: '*.jar')
+    compileAndIncludeInJar 'com.dynatrace.sdk:server-rest-sdk:7.0.0'
 	compile 'org.apache.ant:ant:1.7.1'
 
 	testCompile 'junit:junit:4.12'
