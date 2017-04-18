@@ -58,18 +58,13 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
         Sessions sessions = spy(new Sessions(this.getTask().getDynatraceClient()));
 
         /** define responses */
-        doReturn("example-session-name").when(sessions).stopRecording("stop-recording");
-        doReturn(true).when(sessions).reanalyze("example-session-name");
-        doReturn(true).when(sessions).getReanalysisStatus("example-session-name");
+        doReturn("example-session-uri").when(sessions).stopRecording("stop-recording");
 
         doThrow(new ServerConnectionException("message", new Exception())).when(sessions).stopRecording("stop-recording-with-exception");
 
         whenNew(Sessions.class).withAnyArguments().thenReturn(sessions);
 
         /** verify default values */
-        assertThat(this.getTask().isDoReanalyzeSession(), is(false));
-        assertThat(this.getTask().getReanalyzeSessionTimeout(), is(60000));
-        assertThat(this.getTask().getReanalyzeSessionPollingInterval(), is(5000));
         assertThat(this.getTask().getStopDelay(), is(0));
         assertThat(this.getTask().isFailOnError(), is(true));
     }
@@ -90,12 +85,12 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
 
         try {
 
-            this.getTask().getProject().setProperty("dtSessionNameProperty", "other-session-name-property");
-            this.getTask().setSessionNameProperty("session-name-property");
+            this.getTask().getProject().setProperty("dtSessionUriProperty", "other-session-uri-property");
+            this.getTask().setSessionUriProperty("session-uri-property");
             this.getTask().setProfileName("stop-recording");
             this.getTask().execute();
 
-            assertThat(this.getTask().getProject().getProperty("session-name-property"), is("example-session-name"));
+            assertThat(this.getTask().getProject().getProperty("session-uri-property"), is("example-session-uri"));
         } catch (Exception e) {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }
@@ -103,35 +98,16 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
 
 
     @Test
-    public void testStopRecordingWithSessionNamePropertyFromProject() throws Exception {
+    public void testStopRecordingWithSessionUriPropertyFromProject() throws Exception {
         this.applyFreshEnvironment();
 
         try {
 
-            this.getTask().getProject().setProperty("dtSessionNameProperty", "session-name-property");
+            this.getTask().getProject().setProperty("dtSessionUriProperty", "session-uri-property");
             this.getTask().setProfileName("stop-recording");
             this.getTask().execute();
 
-            assertThat(this.getTask().getProject().getProperty("session-name-property"), is("example-session-name"));
-        } catch (Exception e) {
-            fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
-        }
-    }
-
-    @Test
-    public void testStopRecordingWithReanalyzeSession() throws Exception {
-        this.applyFreshEnvironment();
-
-        try {
-
-            this.getTask().setProfileName("stop-recording");
-            this.getTask().setSessionNameProperty("session-name-property");
-            this.getTask().setReanalyzeStatusProperty("reanalyze-status-property");
-            this.getTask().setDoReanalyzeSession(true);
-            this.getTask().execute();
-
-            assertThat(this.getTask().getProject().getProperty("session-name-property"), is("example-session-name"));
-            assertThat(this.getTask().getProject().getProperty("reanalyze-status-property"), is("true"));
+            assertThat(this.getTask().getProject().getProperty("session-uri-property"), is("example-session-uri"));
         } catch (Exception e) {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }
@@ -157,19 +133,12 @@ public class DtStopRecordingTest extends AbstractDynatraceTest<DtStopRecording> 
         this.applyFreshEnvironment();
 
         try {
-            this.getTask().setDoReanalyzeSession(true);
-            this.getTask().setReanalyzeSessionTimeout(30000);
-            this.getTask().setReanalyzeSessionPollingInterval(2500);
             this.getTask().setStopDelay(2500);
-            this.getTask().setSessionNameProperty("abc");
-            this.getTask().setReanalyzeStatusProperty("def");
+            this.getTask().setSessionUriProperty("abc");
 
-            assertThat(this.getTask().isDoReanalyzeSession(), is(true));
-            assertThat(this.getTask().getReanalyzeSessionTimeout(), is(30000));
-            assertThat(this.getTask().getReanalyzeSessionPollingInterval(), is(2500));
             assertThat(this.getTask().getStopDelay(), is(2500));
-            assertThat(this.getTask().getSessionNameProperty(), is("abc"));
-            assertThat(this.getTask().getReanalyzeStatusProperty(), is("def"));
+            assertThat(this.getTask().getSessionUriProperty(), is("abc"));
+
         } catch (Exception e) {
             fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
         }

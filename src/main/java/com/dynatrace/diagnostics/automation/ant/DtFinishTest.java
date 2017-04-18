@@ -28,54 +28,41 @@
 
 package com.dynatrace.diagnostics.automation.ant;
 
-import com.dynatrace.sdk.server.agentsandcollectors.AgentsAndCollectors;
-import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
-import com.dynatrace.sdk.server.exceptions.ServerResponseException;
+import com.dynatrace.sdk.server.testautomation.TestAutomation;
 import org.apache.tools.ant.BuildException;
+import org.apache.tools.ant.Project;
 
-/**
- * Ant task to restart or shutdown the collector
- */
-public class DtRestartCollector extends DtServerBase {
 
-    private boolean restart = true;
-    private String collector;
+public class DtFinishTest extends DtServerProfileBase {
 
-    /**
-     * Executes ant task
-     *
-     * @throws BuildException whenever connecting to the server, parsing a response or execution fails
-     */
+    private String testRunId = null;
+
     @Override
-    public void execute() throws BuildException {
-        AgentsAndCollectors agentsAndCollectors = new AgentsAndCollectors(this.getDynatraceClient());
-
+    public void execute() {
         try {
-            if (this.restart) {
-                this.log(String.format("Restarting '%s' collector", this.collector));
-                agentsAndCollectors.restartCollector(this.collector);
-            } else {
-                this.log(String.format("Shutdown '%s' collector", this.collector));
-                agentsAndCollectors.shutdownCollector(this.collector);
+            if (testRunId == null) {
+                testRunId = this.getProject().getProperty(TESTRUN_ID_PROPERTY_NAME);
             }
-        } catch (ServerConnectionException | ServerResponseException e) {
-            throw new BuildException(String.format("Error while trying to restart/shutdown '%s' collector: %s", this.collector, e.getMessage()), e);
+            if (testRunId == null) {
+                throw new BuildException();
+            }
+            TestAutomation testAutomation = new TestAutomation(this.getDynatraceClient());
+            testAutomation.finishTestRun(this.getProfileName(), testRunId);
+
+            this.log(String.format("Finish testRun on profile %1$s with ID=%2$s", this.getProfileName(), testRunId));
+        } catch (Exception e) {
+            if (testRunId == null) {
+                throw new BuildException(String.format("TestRunId cannont be null: %s", e.getMessage()), e);
+            }
+            this.log(String.format("Exception when finishing testRun: %s", e.getMessage()), e, Project.MSG_ERR);
         }
     }
 
-    public boolean isRestart() {
-        return restart;
+    public final String getTestRunId() {
+        return testRunId;
     }
 
-    public void setRestart(boolean restart) {
-        this.restart = restart;
-    }
-
-    public String getCollector() {
-        return collector;
-    }
-
-    public void setCollector(String collector) {
-        this.collector = collector;
+    public final void setTestRunId(String testRunId) {
+        this.testRunId = testRunId;
     }
 }

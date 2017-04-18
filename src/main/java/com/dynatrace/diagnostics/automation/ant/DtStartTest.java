@@ -33,6 +33,7 @@ import com.dynatrace.sdk.server.testautomation.TestAutomation;
 import com.dynatrace.sdk.server.testautomation.models.CreateTestRunRequest;
 import com.dynatrace.sdk.server.testautomation.models.TestCategory;
 import com.dynatrace.sdk.server.testautomation.models.TestMetaData;
+import com.dynatrace.sdk.server.testautomation.models.TestMetricFilter;
 import org.apache.tools.ant.BuildException;
 import org.apache.tools.ant.Project;
 
@@ -49,7 +50,6 @@ public class DtStartTest extends DtServerProfileBase {
     /* Attributes and properties names  */
     public static final String ATTRIBUTE_TEST_BUILD = "versionBuild";
     public static final String ATTRIBUTE_TEST_CATEGORY = "testCategory";
-    public static final String TESTRUN_ID_PROPERTY_NAME = "dtTestrunID";
     public static final String DT_AGENT_TESTRUN_OPTION = "optionTestRunIdJava";
 
     /* Messages */
@@ -63,7 +63,7 @@ public class DtStartTest extends DtServerProfileBase {
     private static final String INDENTATION_WITH_NEW_LINE = "\n\t";
     private static final String DEEP_INDENTATION_WITH_NEW_LINE = "\n\t\t";
 
-    private final List<CustomProperty> properties = new ArrayList<CustomProperty>();
+    private final List<CustomProperty> properties = new ArrayList<>();
     private String versionMajor;
     private String versionMinor;
     private String versionRevision;
@@ -77,6 +77,7 @@ public class DtStartTest extends DtServerProfileBase {
      * Flag to make this task fail on error. Default: true
      */
     private boolean failOnError = true;
+    private List<TestMetricFilter> metricFilters = new ArrayList<>();
 
     /**
      * Used to add a custom property to the test meta data
@@ -99,7 +100,6 @@ public class DtStartTest extends DtServerProfileBase {
             this.checkVersionInformation();
 
             this.log(this.generateInfoMessage());
-
             TestAutomation testAutomation = new TestAutomation(this.getDynatraceClient());
             String testRunUUID = testAutomation.createTestRun(this.buildTestRunRequest()).getId();
 
@@ -180,8 +180,11 @@ public class DtStartTest extends DtServerProfileBase {
         for (CustomProperty property : this.properties) {
             testMetaData.setValue(property.getKey(), property.getValue());
         }
-
         request.setAdditionalMetaData(testMetaData);
+
+        if (!metricFilters.isEmpty()) {
+            request.setIncludedMetrics(metricFilters);
+        }
 
         return request;
     }
@@ -215,6 +218,16 @@ public class DtStartTest extends DtServerProfileBase {
 
             for (CustomProperty property : this.properties) {
                 stringBuilder.append(DEEP_INDENTATION_WITH_NEW_LINE).append(property.getKey()).append("=").append(property.getValue());
+            }
+        }
+
+        if (!this.metricFilters.isEmpty()) {
+
+            stringBuilder.append(INDENTATION_WITH_NEW_LINE).append("metric filter: ");
+            for (TestMetricFilter metricFilter : metricFilters) {
+                stringBuilder.append(DEEP_INDENTATION_WITH_NEW_LINE)
+                        .append("group").append("=").append(metricFilter.getGroup())
+                        .append(", metric").append("=").append(metricFilter.getMetric());
             }
         }
 
@@ -290,4 +303,7 @@ public class DtStartTest extends DtServerProfileBase {
         this.failOnError = failOnError;
     }
 
+    public void addMetricFilter(TestMetricFilter metricFilter) {
+        this.metricFilters.add(metricFilter);
+    }
 }

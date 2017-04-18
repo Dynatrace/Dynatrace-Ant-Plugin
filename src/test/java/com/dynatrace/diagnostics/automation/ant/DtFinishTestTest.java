@@ -28,71 +28,62 @@
 
 package com.dynatrace.diagnostics.automation.ant;
 
-import com.dynatrace.sdk.server.exceptions.ServerConnectionException;
-import com.dynatrace.sdk.server.sessions.Sessions;
+import static org.powermock.api.mockito.PowerMockito.*;
+
 import org.apache.tools.ant.BuildException;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
+import org.mockito.Mockito;
 import org.powermock.core.classloader.annotations.PrepareForTest;
 import org.powermock.modules.junit4.PowerMockRunner;
 
-import static org.hamcrest.core.IsInstanceOf.instanceOf;
-import static org.junit.Assert.assertThat;
-import static org.junit.Assert.fail;
-import static org.powermock.api.mockito.PowerMockito.*;
+import com.dynatrace.sdk.server.testautomation.TestAutomation;
+import com.dynatrace.sdk.server.testautomation.models.TestRun;
 
 @RunWith(PowerMockRunner.class)
-@PrepareForTest({Sessions.class, DtClearSession.class})
-public class DtClearSessionTest extends AbstractDynatraceTest<DtClearSession> {
-    private static final String CLEAR_SESSION_TARGET_NAME = "clearSession";
+@PrepareForTest({TestAutomation.class, DtFinishTest.class})
+public class DtFinishTestTest extends AbstractDynatraceTest<DtFinishTest> {
+    private static final String TESTRUN_ID_PROPERTY_NAME = "dtTestrunID";
+    private static final String EXAMPLE_TEST_RUN_ID = "7f98a064-d00d-4224-8803-2f87f4988584";
+
+    TestAutomation testAutomation;
 
     @Before
     public void setUp() throws Exception {
         this.applyFreshEnvironment();
-        whenNew(DtClearSession.class).withAnyArguments().thenReturn(this.getTask());
+        whenNew(DtFinishTest.class).withAnyArguments().thenReturn(this.getTask());
 
-        Sessions sessions = spy(new Sessions(this.getTask().getDynatraceClient()));
-
-        /** define responses */
-        doReturn(true).when(sessions).clear("profile-success");
-        doThrow(new ServerConnectionException("message", new Exception())).when(sessions).clear("profile-fail");
-
-        whenNew(Sessions.class).withAnyArguments().thenReturn(sessions);
+        testAutomation = spy(new TestAutomation(this.getTask().getDynatraceClient()));
+        doReturn(mock(TestRun.class)).when(testAutomation).finishTestRun(Mockito.any(),Mockito.any());
+        whenNew(TestAutomation.class).withAnyArguments().thenReturn(testAutomation);
     }
 
     @Override
     protected String getTaskTargetName() {
-        return CLEAR_SESSION_TARGET_NAME;
+        return TESTRUN_ID_PROPERTY_NAME;
     }
 
     @Override
-    protected DtClearSession createNewInstanceOfTheTask() {
-        return new DtClearSession();
+    protected DtFinishTest createNewInstanceOfTheTask() {
+        return new DtFinishTest();
     }
 
     @Test
-    public void testClearSessionWithSuccess() throws Exception {
+    public void finishShouldBeExecuted() throws Exception {
         this.applyFreshEnvironment();
+        this.getTask().setTestRunId(EXAMPLE_TEST_RUN_ID);
 
-        try {
-            this.getTask().setProfileName("profile-success");
-            this.getTask().execute();
-        } catch (Exception e) {
-            fail(String.format("Exception shouldn't be thrown: %s", e.getMessage()));
-        }
+        this.getTask().execute();
+
+        Mockito.verify(testAutomation).finishTestRun(Mockito.any(),Mockito.any());
     }
 
-    @Test
-    public void testClearSessionWithException() throws Exception {
+    @Test(expected = BuildException.class)
+    public void finishWithEmpyTestRunIdShouldFail() throws Exception{
         this.applyFreshEnvironment();
+        this.getTask().getProject().setProperty(TESTRUN_ID_PROPERTY_NAME,null);
 
-        try {
-            this.getTask().setProfileName("profile-fail");
-            this.getTask().execute();
-            fail("Exception should be thrown");
-        } catch (Exception e) {
-            assertThat(e, instanceOf(BuildException.class));
-        }
+        this.getTask().execute();
     }
 }
