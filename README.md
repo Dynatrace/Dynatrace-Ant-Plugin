@@ -25,8 +25,6 @@ The automation plugin enables FULL Automation of Dynatrace by leveraging the RES
 * Dynatrace Application Monitoring version: 7.0+
 * Ant 1.9+
 
-Find further information in the [Automation Library (Ant, Maven) for Dynatrace](https://community.dynatrace.com/community/display/DL/Automation+Library+%28Ant,+Maven%29+for+Dynatrace).
-
 ### <a name="manual_installation"></a>Manual Installation
 
 * Download the [latest plugin](https://github.com/Dynatrace/Dynatrace-Ant-Plugin/releases) and extract it into the `lib` folder in your project
@@ -58,8 +56,10 @@ Resource Dumps
 * DtFinishTest - Finish Test Run
 
 ## <a name="resources"></a>Additional Resources
-- [Test Automation and Ant](https://community.dynatrace.com/community/display/DOCDT63/Test+Automation+and+Ant)
-- [Continuous Delivery & Test Automation](https://community.dynatrace.com/community/pages/viewpage.action?pageId=215161284)
-- [Capture Performance Data from Tests](https://community.dynatrace.com/community/display/DOCDT63/Capture+Performance+Data+from+Tests)
-- [Integrate Dynatrace in Continous Integration Builds](https://community.dynatrace.com/community/display/DOCDT63/Integrate+Dynatrace+in+Continuous+Integration+Builds)
 
+- [Continuous Delivery & Test Automation](https://www.dynatrace.com/support/doc/appmon/continuous-delivery-test-automation/)
+- [Capture Performance Data from Tests](https://www.dynatrace.com/support/doc/appmon/continuous-delivery-test-automation/capture-performance-data-from-tests/)
+- [Integrate Dynatrace in Continous Integration Builds](https://www.dynatrace.com/support/doc/appmon/continuous-delivery-test-automation/automation-and-integration/continuous-integration-builds/)
+
+Previous versions:
+- [Automation Library (Ant, Maven) for Dynatrace](https://community.dynatrace.com/community/display/DL/Automation+Library+%28Ant,+Maven%29+for+Dynatrace)
